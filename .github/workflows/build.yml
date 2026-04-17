@@ -2,7 +2,7 @@ name: Build IPK
 
 on:
   push:
-    branches: [ "master", "main" ]   # 👈 这里监听你自己的 master 或 main 分支
+    branches: [ "master", "main" ]
     tags: [ "v*" ]
 
 jobs:
@@ -13,9 +13,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build LuCI ipk
-        uses: sbwml/openwrt-gh-action-sdk@main
+        uses: sbwml/openwrt-gh-action-sdk@master
         env:
-          ARCH: x86_64-23.05
+          ARCH: x86-64-23.05.4   # 使用官方精确镜像标签
           FEEDNAME: packages
           PACKAGES: luci-app-netwiz
           NO_REFRESH_CHECK: true
