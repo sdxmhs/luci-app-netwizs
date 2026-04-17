@@ -1,14 +1,26 @@
 name: Build IPK & APK
 
 on:
+  # 1. 标签触发：如果你在 GitHub 网页上手动打 v 开头的 Tag，会自动运行
   push:
-    branches: [ "master", "main" ]
     tags: [ "v*" ]
+  
+  # 2. 手动触发：允许你在 Actions 页面手动点击运行，并输入版本号
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号 (例如: v1.0.2)'
+        required: true
+        default: 'v1.0.2'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 👇 开启矩阵模式！
+    # 👇 必须开启写入权限，机器人才能帮你把文件放到 Releases 橱窗里
+    permissions:
+      contents: write 
+    
+    # 👇 开启矩阵模式！系统会自动开启两台服务器同时干活
     strategy:
       matrix:
         # 定义两个目标版本：一个是 23.05.5(产出ipk)，一个是 snapshot(产出apk)
@@ -21,7 +33,7 @@ jobs:
       - name: Build LuCI package
         uses: sbwml/openwrt-gh-action-sdk@main   
         env:
-          # 👇 这里的版本号变成了动态变量！每次循环带入一个版本
+          # 这里的版本号变成了动态变量！每次循环带入一个版本
           ARCH: ${{ matrix.sdk_version }}
           PACKAGES: luci-app-netwiz
           NO_REFRESH_CHECK: true
@@ -29,7 +41,20 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          # 👇 给打包出来的文件动态命名，防止互相覆盖
+          # 给打包出来的临时文件动态命名，防止它们互相覆盖
           name: luci-app-netwiz-${{ matrix.sdk_version }}
           path: bin/packages/*/*/luci-app-netwiz*.*pk
-          compression-level: 0
+          compression-level: 0 
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        # 👇 只有在“打标签”或“手动点击”时，才会触发发布，避免平时推代码也乱发版
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          # 自动识别版本号：如果是手动运行就用你输入的，如果是打标签就用标签名
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
+          # 🎯 强力搜索全盘的 .ipk 和 .apk，直接作为独立文件上传（不会被打包成 zip）
+          files: |
+            bin/**/*.ipk
+            bin/**/*.apk
+          generate_release_notes: true
