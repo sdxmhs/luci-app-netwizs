@@ -507,19 +507,34 @@ return view.extend({
                 }
             };
             
+            // 判断是断网还是权限报错
+            var startTime = Date.now();
+            
             callNetSetup(actualMode, arg1, arg2, arg3, arg4).then(function() {
                 rpcDone = true;
                 handleSuccess();
-            }).catch(function(){
-                rpcDone = true;
-                handleSuccess();
+            }).catch(function(e) {
+                var timePassed = Date.now() - startTime;
+                if (timePassed < 1500) {
+                    // 如果在 1.5 秒内瞬间报错，说明根本没走到断网那一步，是 ACL 权限或 RPC 崩溃了！
+                    rpcDone = true;
+                    openModal({
+                        title: '❌ 写入失败 (权限/底层拦截)', 
+                        msg: '底层调用被拒绝！请检查插件的 ACL 权限配置是否生效。<br><br><span style="font-size:12px; color:#888;">错误信息: ' + (e.message || 'Permission Denied') + '</span>', 
+                        okText: '关闭'
+                    });
+                } else {
+                    // 如果过了好几秒才报错，说明是网络正常重启导致的失联，判定为成功！
+                    rpcDone = true;
+                    handleSuccess();
+                }
             });
 
             setTimeout(function() {
                 if (!rpcDone) {
                     handleSuccess();
                 }
-            }, 3000);
+            }, 4000); // 增加到 4 秒，给底层重启留出更充裕的时间
         });
     }
 });
