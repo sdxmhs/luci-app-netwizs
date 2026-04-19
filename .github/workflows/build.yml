@@ -36,7 +36,7 @@ jobs:
             else
               MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | tr -d 'v')
               MINOR=$(echo $LATEST_TAG | cut -d. -f2)
-              # 💡 直接对第二段 (MINOR) 进行 +1 操作
+              # 直接对第二段 (MINOR) 进行 +1 操作
               MINOR=$((MINOR + 1))
               NEW_VER="v${MAJOR}.${MINOR}"
             fi
