@@ -3,13 +3,16 @@ name: luci-app-netwiz Build IPK & APK
 on:
   workflow_dispatch:
     inputs:
+      version:
+        description: '🔖 本次发布的版本号 (必须以v开头，例如 v1.0.9)'
+        required: true
+        default: 'v1.0.9'
       highlights:
-        description: '✨ OpenWrt/ImmortalWrt一键安装版更新说明'
+        description: '✨ 更新说明 (支持 Markdown)'
         required: false
-        default: '常规维护与稳定性更新v'
+        default: '常规维护与稳定性更新'
 
 jobs:
-  # 多架构并行编译
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -30,7 +33,6 @@ jobs:
       - name: Prepare Fixed-Name Packages
         run: |
           mkdir -p release_pkgs
-          # 化繁为简：找到生成的包并统一命名，找不到也不会报错
           find bin/ -name "luci-app-netwiz*.ipk" -exec cp {} release_pkgs/luci-app-netwiz.ipk \;
           find bin/ -name "luci-app-netwiz*.apk" -exec cp {} release_pkgs/luci-app-netwiz.apk \;
 
@@ -41,9 +43,8 @@ jobs:
           path: release_pkgs/*
           compression-level: 0 
 
-  # 二：统一收集并发布
   release:
-    needs: build  # 💡 核心指令：必须等上面的 build 彻底完成才执行
+    needs: build 
     runs-on: ubuntu-latest
     permissions:
       contents: write 
@@ -53,22 +54,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: final_release
-          merge-multiple: true # 把多台机器的 ipk 和 apk 合并到这一个文件夹里！
+          merge-multiple: true 
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: NetWiz 最新极速安装版
+          # 自动读取你填写的版本号，生成对应的标签和炫酷标题
+          tag_name: ${{ github.event.inputs.version }}
+          name: NetWiz ${{ github.event.inputs.version }} 极速安装版
           body: |
             ### ✨ 最新版发布
-            ${{ github.event.inputs.highlights || '持续优化与稳定性更新。' }}
+            ${{ github.event.inputs.highlights }}
             
             ---
             
             ### 🚀 全平台一键极速安装
-            无论你的路由器是 OpenWrt/ImmortalWrt/iStoreOS 23.05 (老版) 还是 25.x (新版)，请使用 SSH 登录路由器终端，**直接复制并运行下方这一行代码**。
-            它会自动识别您的系统版本，并自动下载对应格式的安装包完成部署：
+            无论你的路由器是 OpenWrt/ImmortalWrt 23.05 还是 25.x，请使用 SSH 登录路由器终端，直接复制并运行下方代码：
             
             ```bash
             wget -qO- https://raw.githubusercontent.com/${{ github.repository }}/master/install.sh | sh
