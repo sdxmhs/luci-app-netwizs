@@ -46,7 +46,7 @@ return view.extend({
             '.nw-card:hover { transform: translateY(-5px); }',
             '.nw-card[data-mode="router"] { background: rgba(79, 150, 101, 0.85); }',
             '.nw-card[data-mode="pppoe"] { background: rgba(80, 0, 183, 0.85); }',
-            '.nw-card[data-mode="lan"] { background: rgba(253, 0, 115, 0.85); }',
+            '.nw-card[data-mode="lan"] { background: rgba(245, 54, 92, 0.85); }',
             '.nw-badge { width: 54px; height: 54px; line-height: 54px; border-radius: 50%; font-size: 20px; font-weight: bold; margin-bottom: 20px; }',
             '.nw-badge-dhcp { background: #e0f2fe; color: #0284c7; }',
             '.nw-badge-pppoe { background: #f3e8ff; color: #9333ea; }',
@@ -93,7 +93,7 @@ return view.extend({
             '<div class="nw-wrapper">',
             '  <div class="nw-header">',
             '    <div id="nw-update-badge">🚀 发现新版本 <span id="nw-new-ver"></span></div>',
-            '    <div class="nw-main-title">网 络 设 置 向 导 <span style="font-size:14px; background:#10b981; padding:4px 10px; border-radius:6px; vertical-align:middle;">' + CURRENT_VERSION + '</span></div>',
+            '    <div class="nw-main-title">网 络 设 置 向 导 <span style="font-size:14px; background:#67A57B; padding:4px 10px; border-radius:6px; vertical-align:middle;">' + CURRENT_VERSION + '</span></div>',
             '    <p>「 纯净 · 安全 · 零破坏 」的极简网络配置</p>',
             '  </div>',
 
@@ -151,11 +151,11 @@ return view.extend({
             '           <div style="font-weight: 600; color: #222; font-size: 16px;">启用旁路由模式</div>',
             '           <label class="nw-switch"><input type="checkbox" id="lan-bypass-toggle"><span class="nw-slider"></span></label>',
             '        </div>',
-            '        <div id="lan-bypass-warning" style="display:none; background: #fef2f2; color: #ef4444; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #fecaca; line-height: 1.7; letter-spacing: 1px;">',
-            '           <b>旁路由模式开启：</b><br>1、DHCP 将会关闭，设备无法从本机获取 IP。<br>2、网关必须填写上级主路由 IP。<br>3、本机 IP 如有变更，请确保访问端与修改后 IP 处于同一网段，否则将<b style="color: #059669;">无法访问本路由器</b>！',
+            '        <div id="lan-bypass-warning" style="display:none; background: #fef2f2; color: #ef4444; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #fecaca; line-height: 1.7; letter-spacing: 1px; font-weight: bolder;">',
+            '           <b style="font-size: 16px;">旁路由模式开启：</b><br>1、DHCP 将会关闭，设备无法从本机获取 IP。<br>2、网关必须填写上级主路由 IP。<br>3、本机 IP 如有变更，请确保访问端与修改后 IP 处于同一网段，否则将<b style="font-size: 16px; color: #059669;">无法访问本路由器</b>！',
             '        </div>',
-            '        <div id="lan-main-warning" style="background: #f0fdf4; color: #059669; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #bbf7d0; line-height: 1.7; letter-spacing: 1px;">',
-            '           <b>主路由模式开启：</b><br>1、DHCP 将会开启，本机负责分配 IP。<br>2、主路由网关通常留空。<br>3、本机 IP 如有变更，请确保访问端与修改后 IP 处于同一网段，否则将<b style="color: #dc2626;">无法访问本路由器</b>！',
+            '        <div id="lan-main-warning" style="background: #f0fdf4; color: #059669; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; border: 1px solid #bbf7d0; line-height: 1.7; letter-spacing: 1px; font-weight: bolder;">',
+            '           <b style="font-size: 16px;">主路由模式开启：</b><br>1、DHCP 将会开启，本机负责分配 IP。<br>2、主路由网关通常留空。<br>3、本机 IP 如有变更，请确保访问端与修改后 IP 处于同一网段，否则将<b style="font-size: 16px; color: #dc2626;">无法访问本路由器</b>！',
             '        </div>',
             '        <div class="cbi-value"><label class="cbi-value-title">本机局域网 IP</label><div class="cbi-value-field"><input type="text" id="lan-ip" placeholder="例: 192.168.1.2" autocomplete="new-password"></div></div>',
             '        <div class="cbi-value"><label class="cbi-value-title">局域网网关</label><div class="cbi-value-field"><input type="text" id="lan-gw" placeholder="主路由留空，旁路由必填" autocomplete="new-password"></div></div>',
@@ -276,7 +276,7 @@ return view.extend({
                 }
 
                 if (modeTextEl) {
-                    modeTextEl.innerHTML = "<div style='font-size:17px; font-weight:600; margin-bottom:10px; color:#ffffff;'>" + sTitle + "</div>" +
+                    modeTextEl.innerHTML = "<div style='font-size:17px; font-weight:600; margin-bottom:10px; color:#ffffff;font-family: monospace; '>" + sTitle + "</div>" +
                                            "<div style='font-size:15px; font-weight:bold; color:#ffffff; font-family:monospace; letter-spacing:0.5px;'>" + sDetails + "</div>";
                 }
             }).catch(function() {
