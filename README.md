@@ -16,54 +16,6 @@
 
 ---
 
-## 🚀 极速安装 (推荐)
-
-我们提供了一键智能安装脚本。无论你是老系统还是新系统，只需在 SSH 终端中直接复制并执行以下单行命令，即可自动完成 **【判断系统架构 -> 下载对应格式 -> 安装 -> 修复权限与清理缓存】** 的全流程：
-
-```bash
-wget -qO- https://raw.githubusercontent.com/huchd0/luci-app-netwiz/master/install.sh | sh
-```
-
-💡 **提示**：如果你的网络无法直接访问 GitHub Raw，可以在链接前加上代理加速，例如：
-```bash
-wget -qO- https://ghproxy.net/https://raw.githubusercontent.com/huchd0/luci-app-netwiz/master/install.sh | sh
-```
-
----
-
-## 🛠️ 手动安装 (离线包)
-
-如果你习惯手动操作，请前往 [Releases 页面] 下载最新的安装包，并使用 WinSCP 将其上传至路由器的 `/tmp/` 目录。
-
-**对于 OpenWrt 25.x 及最新快照版 (`.apk` 格式)：**
-上传至 `/tmp/` 目录后，运行以下命令（注意：新版 25.x 由于签名限制，网页直接上传会报 `Error 99`，请务必使用下方的命令行安装）：
-```bash
-apk add --allow-untrusted /tmp/luci-app-netwiz.apk
-rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
-```
-
-**对于 OpenWrt 23.05 及更早系统 (`.ipk` 格式)：**
-以下两种方式任选其一：
-1. 网页端：在系统后台使用 “系统 -> 软件包 -> 上传软件包” 正常安装。
-2. 命令行：上传至 `/tmp/` 目录后，运行以下命令：
-```bash
-opkg install /tmp/luci-app-netwiz.ipk
-rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
-```
-
----
-
-## 📸 界面预览
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/1b58d43e-861b-4d21-84c7-21b01f0e066f" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/965c533e-d0ea-4133-899f-f5ad4aacb279" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/84047484-7a63-4f6d-b38e-ed2c10008fa3" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/d7bdcc3f-3771-4c4d-88da-05ce49af98c2" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/31c47e9e-3f45-41ef-b3a2-10515b3d631b" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/4a7213c9-76ad-4cf0-8b34-6755d87c2e20" />
-<img width="600" alt="Image" src="https://github.com/user-attachments/assets/5ea50518-1f03-4047-b318-a6ef9955590c" />
-
----
-
 ## 📖 使用说明
 
 安装完成后，刷新路由器后台网页（建议使用 `Ctrl + F5` 强制刷新或在无痕模式下打开），即可在导航栏找到对应入口：
@@ -85,6 +37,44 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
 
 ---
 
+
+## 一、🚀 极速安装 (推荐)
+
+我们提供了一键智能安装脚本。无论你是老系统还是新系统，只需在 SSH 终端中直接复制并执行以下单行命令，即可自动完成 **【判断系统架构 -> 下载对应格式 -> 安装 -> 修复权限与清理缓存】** 的全流程：
+
+```bash
+wget -qO- https://raw.githubusercontent.com/huchd0/luci-app-netwiz/master/install.sh | sh
+```
+
+💡 **提示**：如果你的网络无法直接访问 GitHub Raw，可以在链接前加上代理加速，例如：
+```bash
+wget -qO- https://ghproxy.net/https://raw.githubusercontent.com/huchd0/luci-app-netwiz/master/install.sh | sh
+```
+
+---
+
+## 二、🛠️ 手动安装 (离线包)
+
+如果你习惯手动操作，请前往 [Releases 页面] 下载最新的安装包，并使用 WinSCP 将其上传至路由器的 `/tmp/` 目录。
+
+**对于 OpenWrt 25.x 及最新快照版 (`.apk` 格式)：**
+上传至 `/tmp/` 目录后，运行以下命令（注意：新版 25.x 由于签名限制，网页直接上传会报 `Error 99`，请务必使用下方的命令行安装）：
+```bash
+apk add --allow-untrusted /tmp/luci-app-netwiz.apk
+rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
+```
+
+**对于 OpenWrt 23.05 及更早系统 (`.ipk` 格式)：**
+以下两种方式任选其一：
+1. 网页端：在系统后台使用 “系统 -> 软件包 -> 上传软件包” 正常安装。
+2. 命令行：上传至 `/tmp/` 目录后，运行以下命令：
+```bash
+opkg install /tmp/luci-app-netwiz.ipk
+rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
+```
+
+---
+
 ## 💡 常见问题 (FAQ)
 
 **Q：安装后点击菜单提示 `HTTP 404` 或 `Object not found (-32000)`？**
@@ -96,6 +86,17 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
 
 **Q：在局域网设置里修改了 IP 后，为什么一直在转圈，打不开网页了？**
 A：如果您修改了本机的局域网 IP，点击“确认应用”后底层网络会立刻重置。系统会在几秒后尝试为您自动跳转，如果由于浏览器安全策略未跳转成功，原有的旧 IP 网页将失效。请直接在浏览器地址栏手动输入您新设置的 IP 地址即可恢复访问。
+
+---
+
+## 📸 界面预览
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/1b58d43e-861b-4d21-84c7-21b01f0e066f" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/965c533e-d0ea-4133-899f-f5ad4aacb279" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/84047484-7a63-4f6d-b38e-ed2c10008fa3" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/d7bdcc3f-3771-4c4d-88da-05ce49af98c2" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/31c47e9e-3f45-41ef-b3a2-10515b3d631b" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/4a7213c9-76ad-4cf0-8b34-6755d87c2e20" />
+<img width="600" alt="Image" src="https://github.com/user-attachments/assets/5ea50518-1f03-4047-b318-a6ef9955590c" />
 
 ---
 
