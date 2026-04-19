@@ -1,9 +1,16 @@
-name: luci-app-netwiz Build & Release
+name: NetWiz 自动编译与发布
 
 on:
-  # 💡 核心改變：當你在 GitHub 網頁上發佈一個 Release 時，自動觸發此流水線
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '🔖 本次发布的版本号 (必须以v开头，例如 v1.0.9)'
+        required: true
+        default: 'v1.0.9'
+      highlights:
+        description: '✨ 更新说明 (支持 Markdown)'
+        required: false
+        default: '常规维护与稳定性更新。'
 
 jobs:
   build:
@@ -13,55 +20,63 @@ jobs:
         sdk_version: [ "x86_64-23.05.5", "x86_64-snapshot" ]
         
     steps:
-      - name: Checkout code
+      - name: 检出代码 (Checkout)
         uses: actions/checkout@v4
 
-      # 💡 魔法步驟：自動讀取 Release 的標籤名 (Tag)，並覆寫到 JS 檔案中
-      - name: Auto Inject Version into JS
+      - name: 自动注入版本号到 JS 前端
         run: |
-          # 這裡的 github.event.release.tag_name 就會精準抓取你在發佈頁面填寫的標籤 (例如 v1.0.9)
-          VERSION_TAG="${{ github.event.release.tag_name }}"
-          echo "檢測到新版本發佈，正在將 JS 版本號自動替換為: $VERSION_TAG"
-          
-          # 替換 JS 中的版本號 (請確保路徑正確，如果你的 js 放在其他資料夾，請修改最後面的路徑)
-          sed -i "s/var CURRENT_VERSION = '.*';/var CURRENT_VERSION = '$VERSION_TAG';/g" luci-app-netwiz/root/www/luci-static/resources/view/netwiz.js
+          echo "正在将版本号自动替换为: ${{ github.event.inputs.version }}"
+          sed -i "s/var CURRENT_VERSION = '.*';/var CURRENT_VERSION = '${{ github.event.inputs.version }}';/g" luci-app-netwiz/root/www/luci-static/resources/view/netwiz.js
 
-      - name: Build LuCI package
+      - name: 编译 LuCI 插件
         uses: sbwml/openwrt-gh-action-sdk@main   
         env:
           ARCH: ${{ matrix.sdk_version }}
           PACKAGES: luci-app-netwiz
           NO_REFRESH_CHECK: true
 
-      - name: Prepare Fixed-Name Packages
+      - name: 提取并重命名安装包
         run: |
           mkdir -p release_pkgs
           find bin/ -name "luci-app-netwiz*.ipk" -exec cp {} release_pkgs/luci-app-netwiz.ipk \;
           find bin/ -name "luci-app-netwiz*.apk" -exec cp {} release_pkgs/luci-app-netwiz.apk \;
 
-      - name: Upload Artifacts to Cloud
+      - name: 上传编译产物到云端
         uses: actions/upload-artifact@v4
         with:
           name: packages-${{ matrix.sdk_version }}
           path: release_pkgs/*
           compression-level: 0 
 
-  release_assets:
+  release:
     needs: build 
     runs-on: ubuntu-latest
     permissions:
       contents: write 
       
     steps:
-      - name: Download all artifacts
+      - name: 下载所有架构的编译产物
         uses: actions/download-artifact@v4
         with:
           path: final_release
           merge-multiple: true 
 
-      # 💡 把編譯好的安裝包，上傳並附加到你剛剛觸發這個流水線的 Release 頁面中
-      - name: Upload Assets to Existing Release
+      - name: 自动创建 GitHub Release 发布页
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ github.event.inputs.version }}
+          name: NetWiz ${{ github.event.inputs.version }} 极速安装版
+          body: |
+            ### ✨ 最新版发布
+            ${{ github.event.inputs.highlights }}
+            
+            ---
+            
+            ### 🚀 全平台一键极速安装
+            无论你的路由器是 OpenWrt/ImmortalWrt 23.05 还是 25.x，请使用 SSH 登录路由器终端，直接复制并运行下方代码：
+            
+            ```bash
+            wget -qO- [https://raw.githubusercontent.com/$](https://raw.githubusercontent.com/$){{ github.repository }}/master/install.sh | sh
+            ```
           files: final_release/*
+          generate_release_notes: false
