@@ -7,7 +7,7 @@
 
 var CURRENT_VERSION = 'v1.0.0';
 
-// 仅保留这一个全能通道！
+// 保留这一个全能通道！
 var callNetSetup = rpc.declare({
     object: 'netwiz',
     method: 'set_network',
@@ -219,30 +219,30 @@ return view.extend({
                             var showReadyBadge = function() {
                                 badge.className = 'nw-badge-new';
                                 badge.innerText = '🚀 发现新版本 ' + latestVer;
-                                badge.style.display = 'inline-block'; 
+                                badge.style.display = 'inline-block';
                                 
                                 var newBadge = badge.cloneNode(true);
                                 badge.parentNode.replaceChild(newBadge, badge);
                                 badge = newBadge;
 
                                 badge.addEventListener('click', function() {
-                                    var msgHtml = '<b>✨ 新版本安装包已在后台悄悄准备就绪！</b><br><br><b>更新亮点：</b><div style="text-align:left; font-size:13px; background:#f1f5f9; padding:10px; margin-top:10px; border-radius:6px; max-height:150px; overflow-y:auto; border:1px solid #cbd5e1;">' + cleanText.replace(/\n/g, '<br>') + '</div>';
+                                    var msgHtml = '<b>✨ 极速更新，更新完后需要重新登陆路由器！</b><br><br><b>更新亮点：</b><div style="text-align:left; font-size:13px; background:#f1f5f9; padding:10px; margin-top:10px; border-radius:6px; max-height:150px; overflow-y:auto; border:1px solid #cbd5e1;">' + cleanText.replace(/\n/g, '<br>') + '</div>';
 
                                     openModal({
                                         title: '🚀 升级准备就绪 (' + latestVer + ')',
                                         msg: msgHtml,
-                                        okText: '立即安装并重启',
+                                        okText: '立即更新',
                                         cancelText: '暂不更新',
                                         onOk: function() {
                                             openModal({
-                                                title: '⚙️ 正在极速安装', 
+                                                title: '⚙️ 正在极速安装',
                                                 msg: '正在部署本地更新包，请稍候...<br><br><div class="nw-spinner" style="margin-top:20px; width:30px; height:30px;"></div><span style="font-size:13px; color:#666;">安装非常快，系统即将自动刷新...</span>', 
-                                                spin: false 
+                                                spin: false
                                             });
                                             
-                                            // 💡 魔法暗号：do_install
+                                            // do_install
                                             callNetSetup('do_install').then(function() {
-                                                setTimeout(function() { location.reload(true); }, 7000); 
+                                                setTimeout(function() { location.reload(true); }, 7000);
                                             }).catch(function() {
                                                 setTimeout(function() { location.reload(true); }, 7000);
                                             });
@@ -251,12 +251,12 @@ return view.extend({
                                 });
                             };
 
-                            // 💡 魔法暗号：check_update
+                            // check_update
                             callNetSetup('check_update').then(function(res) {
                                 if (res === 1) {
                                     showReadyBadge(); 
                                 } else {
-                                    // 💡 魔法暗号：prepare_update
+                                    // prepare_update
                                     callNetSetup('prepare_update'); 
                                     var pollStatus = setInterval(function() {
                                         callNetSetup('check_update').then(function(r) {
