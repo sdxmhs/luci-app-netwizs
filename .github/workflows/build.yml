@@ -42,7 +42,15 @@ jobs:
               NEW_VER="v${MAJOR}.${MINOR}.${PATCH}"
             fi
           else
-            NEW_VER="$INPUT_VER"
+            # 正则严格校验版本号格式，只匹配：v1.2, 1.2, V1.2.3, 1.2.3 这种标准格式
+            if [[ ! "$INPUT_VER" =~ ^[vV]?[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+              echo "::error::❌ 版本号格式拦截：您输入了非法的版本号『 $INPUT_VER 』！请填写类似 1.2 或 v1.2.3 的标准格式。"
+              exit 1
+            fi
+
+            # 剥离开头可能存在的大小写 v，然后统一加上小写 v
+            CLEAN_VER=$(echo "$INPUT_VER" | sed -e 's/^[vV]//')
+            NEW_VER="v$CLEAN_VER"
           fi
           echo "FINAL_VERSION=$NEW_VER" >> $GITHUB_OUTPUT
 
