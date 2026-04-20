@@ -10,7 +10,7 @@
 'require uci';
 'require poll';
 
-var CURRENT_VERSION = 'v1.0.0';
+var CURRENT_VERSION = 'v1.0.10';
 
 // 保留这一个全能通道！
 var callNetSetup = rpc.declare({
@@ -222,7 +222,7 @@ return view.extend({
             var badge = container.querySelector('#nw-update-badge');
             var now = Date.now();
             var cacheKey = 'nw_last_update_check';
-            var cacheExpiry = 6 * 60 * 60 * 1000; // 6 小时冷却时间
+            var cacheExpiry = 5 * 60 * 1000; // 测试期改为 5 分钟冷却
 
             // 1. 读取本地缓存记录
             var cached = JSON.parse(localStorage.getItem(cacheKey) || '{}');
@@ -241,7 +241,7 @@ return view.extend({
                 badge = newBadge;
 
                 badge.addEventListener('click', function() {
-                    var msgHtml = '<b>✨ 极速更新，更新完后需要重新登陆路由器！</b><br><br><b>更新亮点：</b><div style="text-align:left; font-size:13px; background:#f1f5f9; padding:10px; margin-top:10px; border-radius:6px; max-height:150px; overflow-y:auto; border:1px solid #cbd5e1;">' + cleanText.replace(/\n/g, '<br>') + '</div>';
+                    var msgHtml = '<b>✨ 发现新版本！更新后底层权限将重置，需重新登录。</b><br><br><b>更新亮点：</b><div style="text-align:left; font-size:13px; background:#f1f5f9; padding:10px; margin-top:10px; border-radius:6px; max-height:150px; overflow-y:auto; border:1px solid #cbd5e1;">' + cleanText.replace(/\n/g, '<br>') + '</div>';
 
                     openModal({
                         title: '升级准备就绪 (' + latestVer + ')',
@@ -249,22 +249,22 @@ return view.extend({
                         okText: '立即更新',
                         cancelText: '暂不更新',
                         onOk: function() {
-                            // 停止心跳，防止被踢
+                            // 停止心跳，防止安装中途被提前踢出报错
                             try { poll.stop(); } catch(e) {}
                             
                             openModal({
                                 title: '⚙️ 正在极速安装',
-                                msg: '正在安装更新包，请稍候...<br><br><span style="font-size:13px; color:#666;">网页即将自动刷新。<br>若长时间无响应，请按 <b>Ctrl + F5</b> 手动强制刷新。</span>', 
+                                msg: '新版本部署中，底层权限系统正在重置...<br><br><span style="font-size:13px; color:#10b981; font-weight:bold;">安装完成后，为确保安全，系统将要求您重新登录。</span><br><br><span style="font-size:12px; color:#666;">(网页将在 12 秒后自动跳转，若长时间无响应请按 Ctrl+F5)</span>', 
                                 spin: true 
                             });
 
-                            // 定義強制刷新並帶上時間戳以破解快取的函數
+                            // 定义带时间戳的跳转
                             var forceReload = function() {
                                 var currentUrl = window.location.href.split('?')[0];
                                 window.location.href = currentUrl + '?t=' + new Date().getTime();
                             };
 
-                            // 執行安裝指令
+                            // 执行安装指令
                             callNetSetup('do_install').then(function() {
                                 setTimeout(forceReload, 12000);
                             }).catch(function() {
