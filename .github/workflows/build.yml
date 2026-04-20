@@ -54,9 +54,14 @@ jobs:
           fi
           echo "FINAL_VERSION=$NEW_VER" >> $GITHUB_OUTPUT
 
-      - name: 自动注入最新版本号到 JS 前端
+      - name: 自动注入最新版本号到 JS 前端 和 Makefile
         run: |
+          # 1. 给 JS 注入带 v 的版本号 (如 v1.0.2)
           sed -i "s/var CURRENT_VERSION = '.*';/var CURRENT_VERSION = '${{ steps.calc_version.outputs.FINAL_VERSION }}';/g" luci-app-netwiz/root/www/luci-static/resources/view/netwiz.js
+
+          # 2. 剥离字母 v，给 Makefile 注入纯数字版本号 (如 1.0.2，OpenWrt 官方规范不带 v)
+          RAW_VER=$(echo "${{ steps.calc_version.outputs.FINAL_VERSION }}" | sed -e 's/^[vV]//')
+          sed -i "s/PKG_VERSION:=.*/PKG_VERSION:=$RAW_VER/g" luci-app-netwiz/Makefile
 
       - name: 编译 LuCI 插件
         uses: sbwml/openwrt-gh-action-sdk@main   
