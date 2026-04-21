@@ -676,7 +676,7 @@ return view.extend({
         function doUpdateCheck() {
             var now = Date.now();
             var cacheKey = 'nw_last_update_check';
-            var cacheExpiry = 10 * 60 * 1000;
+            var cacheExpiry = 5 * 60 * 1000;
             var cached = JSON.parse(localStorage.getItem(cacheKey) || '{}');
 
             var showReadyBadge = function(latestVer, rawText) {
@@ -686,7 +686,7 @@ return view.extend({
                 var redDot = container.querySelector('#update-red-dot');
                 var tooltip = container.querySelector('#update-tooltip');
 
-                // 仅当远端版本 > 我们真实的版本时，才显示红点
+                // 仅当远端版本 > 真实版本时，才显示红点
                 if (compareVersions(latestVer, CURRENT_VERSION) <= 0) return;
 
                 redDot.style.display = 'block';
@@ -707,7 +707,7 @@ return view.extend({
                         onOk: function() {
                             try { poll.stop(); } catch(e) {}
                             
-                            // 写入强制无缓存刷新标记到 localStorage，供下次加载时使用
+                            // 仅在确认更新时写入强制无缓存刷新标记到 localStorage
                             localStorage.setItem('nw_force_refresh', '1');
                             localStorage.removeItem('nw_last_update_check');
 
@@ -1057,9 +1057,6 @@ return view.extend({
             var handleSuccess = function() {
                 var currentHost = window.location.hostname, cleanUrl = window.location.href.split('?')[0], ts = new Date().getTime();
                 
-                // 写入强制刷新标记，使用 localStorage 确保即使退出登录也不会被清除
-                localStorage.setItem('nw_force_refresh', '1');
-
                 if (selectedMode === 'lan' && arg1 && arg1 !== currentHost) {
                     openModal({ title: _t('M_SUCC_TIT'), msg: _t('M_SUCC_MSG1') + arg1 + _t('M_SUCC_MSG2'), spin: true });
                     setTimeout(function() { window.location.href = 'http://' + arg1 + '?v=' + ts; }, 15000);
