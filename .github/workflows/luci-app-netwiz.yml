@@ -27,12 +27,12 @@ jobs:
         run: |
           INPUT_VER="${{ github.event.inputs.new_version }}"
           if [ -z "$INPUT_VER" ]; then
-            VERSION=$(grep 'PKG_VERSION:=' applications/luci-app-netwiz/Makefile | cut -d'=' -f2 | tr -d ' ')
+            VERSION=$(grep 'PKG_VERSION:=' luci-app-netwiz/Makefile | cut -d'=' -f2 | tr -d ' ')
             echo "pkg_version=$VERSION" >> $GITHUB_OUTPUT
             echo "skip_build=false" >> $GITHUB_OUTPUT
           else
             # ... 版本更新 ...
-            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$INPUT_VER/g" applications/luci-app-netwiz/Makefile
+            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$INPUT_VER/g" luci-app-netwiz/Makefile
             git config --local user.email "actions@github.com"
             git config --local user.name "Github Actions"
             git add . && git commit -m "bump version" && git push
@@ -55,7 +55,7 @@ jobs:
       - name: 隔离与修正路径
         run: |
           mkdir -p /tmp/pure_plugin
-          cp -r applications/luci-app-netwiz /tmp/pure_plugin/
+          cp -r luci-app-netwiz /tmp/pure_plugin/
           rm -rf *
           cp -r /tmp/pure_plugin/luci-app-netwiz ./
           sed -i 's|../../luci.mk|$(TOPDIR)/feeds/luci/luci.mk|g' luci-app-netwiz/Makefile
