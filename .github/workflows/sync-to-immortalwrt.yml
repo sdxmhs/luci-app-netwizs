@@ -1,6 +1,6 @@
 name: 🔄 手动同步到 ImmortalWrt 官方库
 
-# 这里是修改的核心：只保留了 workflow_dispatch（手动触发），去掉了所有的 push 触发
+# workflow_dispatch手动触发，去掉了所有的 push 触发
 on:
   workflow_dispatch: 
 
@@ -21,14 +21,13 @@ jobs:
           path: dest-repo
           ref: master # ⚠️ immortalwrt/luci 的主分支通常是 master，根据实际情况修改
 
-      - name: 3. 执行魔法搬运
+      - name: 3. 同步执行
         run: |
           echo "🧹 清空目标仓库的旧文件..."
           rm -rf dest-repo/applications/luci-app-netwiz/*
           mkdir -p dest-repo/applications/luci-app-netwiz/
           
           echo "📦 复制最新代码..."
-          # 👇 【核心修改位置】源路径从 source-repo/ 改成了 source-repo/luci-app-netwiz/
           rsync -av --exclude='.git/' --exclude='.github/' source-repo/luci-app-netwiz/ dest-repo/applications/luci-app-netwiz/
 
       - name: 4. 提交并推送到 Fork 仓库
