@@ -49,7 +49,7 @@ Core Supported Modules
    * You have a main router providing Wi-Fi and DHCP for your home. You add a bypass router and set only your laptop’s gateway to it. Now, your laptop’s traffic goes through the bypass router (e.g., for proxy or special routing), while all other devices continue using the main router normally. This way, you get advanced control on one device without affecting the rest of the network.
 ---
 
-## 简体中文
+## 简体中文 | [English](#english) | 
 
 ### 📖简介
 
