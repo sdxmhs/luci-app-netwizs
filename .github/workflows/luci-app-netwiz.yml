@@ -1,0 +1,138 @@
+name: Build and Release luci-app-netwiz
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: '【修改版本号】例如 1, 1.2, 1.2.3。填入后将更新 Makefile 并保存，不发版；留空则读取当前版本并进行双格式(IPK+APK)发版编译。'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Handle Version Input
+    runs-on: ubuntu-22.04
+    outputs:
+      skip_build: ${{ steps.version_handler.outputs.skip_build }}
+      pkg_version: ${{ steps.version_handler.outputs.pkg_version }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Process Input and Update Makefile
+        id: version_handler
+        run: |
+          INPUT_VER="${{ github.event.inputs.new_version }}"
+          if [ -z "$INPUT_VER" ]; then
+            VERSION=$(grep 'PKG_VERSION:=' applications/luci-app-netwiz/Makefile | cut -d'=' -f2 | tr -d ' ')
+            echo "pkg_version=$VERSION" >> $GITHUB_OUTPUT
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+          else
+            # ... 版本更新 ...
+            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$INPUT_VER/g" applications/luci-app-netwiz/Makefile
+            git config --local user.email "actions@github.com"
+            git config --local user.name "Github Actions"
+            git add . && git commit -m "bump version" && git push
+            echo "skip_build=true" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    name: Compile IPK & APK
+    needs: prepare
+    if: needs.prepare.outputs.skip_build != 'true'
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        sdk_version: [ "x86_64-23.05.5", "x86_64-snapshot" ]
+        
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: 隔离与修正路径
+        run: |
+          mkdir -p /tmp/pure_plugin
+          cp -r applications/luci-app-netwiz /tmp/pure_plugin/
+          rm -rf *
+          cp -r /tmp/pure_plugin/luci-app-netwiz ./
+          sed -i 's|../../luci.mk|$(TOPDIR)/feeds/luci/luci.mk|g' luci-app-netwiz/Makefile
+          # 打包前赋予后端脚本执行权限
+          chmod +x luci-app-netwiz/root/usr/libexec/rpcd/netwiz
+
+      - name: 编译
+        uses: sbwml/openwrt-gh-action-sdk@main   
+        env:
+          ARCH: ${{ matrix.sdk_version }}
+          PACKAGES: luci-app-netwiz
+          NO_REFRESH_CHECK: true
+
+      - name: 提取并强制分类命名
+        run: |
+          mkdir -p release_pkgs
+          # 分别处理主程序、简中、繁中，加上类型前缀强制排序
+          for ext in apk ipk; do
+            find bin/ -name "luci-app-netwiz*.$ext" -exec cp {} release_pkgs/${ext}_luci-app-netwiz.$ext \;
+            find bin/ -name "luci-i18n-netwiz-zh-cn*.$ext" -exec cp {} release_pkgs/${ext}_luci-i18n-netwiz-zh-cn.$ext \;
+            find bin/ -name "luci-i18n-netwiz-zh-tw*.$ext" -exec cp {} release_pkgs/${ext}_luci-i18n-netwiz-zh-tw.$ext \;
+          done
+
+      - name: 上传临时产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.sdk_version }}
+          path: release_pkgs/*
+
+  release:
+    name: Publish Release
+    needs: [prepare, build]
+    if: needs.prepare.outputs.skip_build != 'true'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write 
+      
+    steps:
+      - name: 下载产物
+        uses: actions/download-artifact@v4
+        with:
+          path: final_release
+          merge-multiple: true 
+
+      - name: 自动生成发版说明并上传
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.prepare.outputs.pkg_version }}
+          name: "Netwiz 网络设置向导 v${{ needs.prepare.outputs.pkg_version }} 发布"
+          body: |
+            ### 📥 下载指南
+            
+            #### 📦 如果您的系统使用 APK 格式 (推荐/新版系统)：
+            * **所有人必装主程序**：`apk_luci-app-netwiz.apk`
+            * **需要简体中文界面的用户**：额外下载 `apk_luci-i18n-netwiz-zh-cn.apk`
+            * **需要繁體中文介面的用戶**：額外下載 `apk_luci-i18n-netwiz-zh-tw.apk`
+
+            #### 📦 如果您的系统使用 IPK 格式 (传统/老固件)：
+            * **所有人必装主程序**：`ipk_luci-app-netwiz.ipk`
+            * **需要简体中文界面的用户**：额外下载 `ipk_luci-i18n-netwiz-zh-cn.ipk`
+            * **需要繁體中文介面的用戶**：額外下載 `ipk_luci-i18n-netwiz-zh-tw.ipk`
+            
+            ---
+            
+            ### 💡 格式科普 (APK vs IPK 选哪个？)
+            * **APK 格式**：适用于 **新版 ImmortalWrt (23.05+)** 以及 **最新版 OpenWrt 主线**。这是新一代的高速包管理器，性能更好。
+            * **IPK 格式**：适用于 **传统 OpenWrt (23.05 及以下)**、**LEDE** 及市面上大多数老版本的定制固件。
+            
+            > **不知道自己是哪种？** > 登录您的路由器后台，进入“系统 -> 软件包”，如果页面顶部提示“使用 apk 安装...”，那就是 APK；如果什么都没特别说明，通常就是传统的 IPK。
+            
+            ---
+            ⚠️ **注意**：
+              * **插件界面将随设备系统语言自动适配；也可在路由器【系统 → 语言与界面 → 语言选择】中随时切换。**
+              * **安装完成后，请务必在浏览器按下 **`Ctrl + F5`** (或 `Shift + F5`) 强制刷新网页缓存，否则可能无法显示中文或新菜单！**
+          draft: false
+          prerelease: false
+          files: |
+            final_release/*.*pk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
