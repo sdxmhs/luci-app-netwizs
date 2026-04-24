@@ -126,7 +126,7 @@ var T = {
     'M_IP_GW': _('IP & Gateway'),
     'M_AUTO_UP': _('Auto-assigned by upstream router'),
     
-    // 🌟 新增的动态情境与回退提示语
+    // 动态情境与回退提示语
     'M_SUCC_ROLLBACK': _('Connection to new IP timed out, automatically rolled back configuration, reconnecting...'),
     'ACT_LAN': _('Modifying LAN IP'),
     'ACT_BYPASS': _('Switching to Bypass Mode'),
@@ -498,7 +498,7 @@ return view.extend({
             } catch (e) { openModal({title:T['ERR_RD_SYS'], msg:T['ERR_CRASH'], okText:T['M_CLOSE']}); }
         });
 
-        // 最终提交：向后端 RPC 发送写入请求 (异步雷达检测版)
+        // 向后端 RPC 发送写入请求
         container.querySelector('#btn-apply').addEventListener('click', function () {
             var mode = selectedMode, a1 = '', a2 = '', a3 = '', a4 = '', rType = container.querySelector('input[name="router_type"]:checked').value;
             if (selectedMode === 'lan') { a1 = container.querySelector('#lan-ip').value.trim(); a2 = container.querySelector('#lan-gw').value.trim(); a3 = calculateNetmask(a1); a4 = bypassToggle.checked ? '1' : '0';
