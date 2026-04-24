@@ -127,6 +127,7 @@ var T = {
     'M_AUTO_UP': _('Auto-assigned by upstream router'),
     
     // 动态情境与回退提示语
+    'LBL_TARGET': _('Target:'),
     'M_SUCC_ROLLBACK': _('Connection to new IP timed out, automatically rolled back configuration, reconnecting...'),
     'ACT_LAN': _('Modifying LAN IP'),
     'ACT_BYPASS': _('Switching to Bypass Mode'),
@@ -134,9 +135,9 @@ var T = {
     'ACT_WAN_STATIC': _('Switching WAN to Static IP'),
     'ACT_PPPOE': _('Applying PPPoE Dial-up'),
     'MSG_WRITING': _('Writing configuration to system, please do not close the page...'),
-    'MSG_KNOCKING': _('Knocking on the new IP door... Elapsed: '),
-    'MSG_WAIT_NET': _('Waiting for network service to restart... Elapsed: '),
-    'MSG_WAIT_OLD': _('Waiting for old IP to recover... Elapsed: ')
+    'MSG_KNOCKING': _('Knocking on the new IP door... Elapsed: {sec}s'),
+    'MSG_WAIT_NET': _('Waiting for network service to restart... Elapsed: {sec}s'),
+    'MSG_WAIT_OLD': _('Waiting for old IP to recover... Elapsed: {sec}s')
 };
 
 // 声明后端的 RPC 接口调用
@@ -520,7 +521,7 @@ return view.extend({
             }
 
             // 2. 弹出带有实际操作内容的初始面板
-            var initMsg = '<div style="font-size: 16px; margin-bottom: 10px;">Target: ' + actionDetail + '</div><div style="color: #64748b; font-size: 14px;">' + T['MSG_WRITING'] + '</div>';
+            var initMsg = '<div style="font-size: 16px; margin-bottom: 10px;">' + T['LBL_TARGET'] + ' ' + actionDetail + '</div><div style="color: #64748b; font-size: 14px;">' + T['MSG_WRITING'] + '</div>';
             openModal({ title: dynamicTitle, msg: initMsg, spin: true });
             
             var start = Date.now(), done = false;
@@ -538,7 +539,8 @@ return view.extend({
                         var elapsed = Date.now() - start;
                         sec += 2;
                         
-                        var knockingMsg = '<div style="font-size: 16px; margin-bottom: 10px;">Target: <b style="color:#3b82f6;">' + a1 + '</b></div><div style="color: #10b981; font-size: 14px; font-weight: bold;">' + T['MSG_KNOCKING'] + sec + 's</div>';
+                        // 🌟 使用 replace('{sec}', sec) 替换占位符
+                        var knockingMsg = '<div style="font-size: 16px; margin-bottom: 10px;">' + T['LBL_TARGET'] + ' <b style="color:#3b82f6;">' + a1 + '</b></div><div style="color: #10b981; font-size: 14px; font-weight: bold;">' + T['MSG_KNOCKING'].replace('{sec}', sec) + '</div>';
                         document.getElementById('nw-global-msg').innerHTML = knockingMsg;
 
                         if (elapsed < bombTime) {
@@ -552,7 +554,8 @@ return view.extend({
                             var rollbackSec = 0;
                             var checkOldIpTimer = setInterval(function() {
                                 rollbackSec += 2;
-                                var rollbackHtml = '<div style="color:#ef4444; font-weight:bold; font-size:15px; margin-bottom:10px;">' + T['M_SUCC_ROLLBACK'] + '</div><div style="font-size:14px; color:#666; font-weight:bold;">' + T['MSG_WAIT_OLD'] + rollbackSec + 's</div>';
+                                // 🌟 同样使用 replace
+                                var rollbackHtml = '<div style="color:#ef4444; font-weight:bold; font-size:15px; margin-bottom:10px;">' + T['M_SUCC_ROLLBACK'] + '</div><div style="font-size:14px; color:#666; font-weight:bold;">' + T['MSG_WAIT_OLD'].replace('{sec}', rollbackSec) + '</div>';
                                 document.getElementById('nw-global-title').innerHTML = T['M_RST_TIT'];
                                 document.getElementById('nw-global-msg').innerHTML = rollbackHtml;
 
@@ -568,7 +571,8 @@ return view.extend({
                 } else { 
                     var checkSameTimer = setInterval(function() {
                         sec += 2;
-                        var waitNetMsg = '<div style="font-size: 16px; margin-bottom: 10px;">Target: ' + actionDetail + '</div><div style="color: #059669; font-size: 14px; font-weight: bold;">' + T['MSG_WAIT_NET'] + sec + 's</div>';
+                        // 🌟 同样使用 replace
+                        var waitNetMsg = '<div style="font-size: 16px; margin-bottom: 10px;">' + T['LBL_TARGET'] + ' ' + actionDetail + '</div><div style="color: #059669; font-size: 14px; font-weight: bold;">' + T['MSG_WAIT_NET'].replace('{sec}', sec) + '</div>';
                         document.getElementById('nw-global-msg').innerHTML = waitNetMsg;
 
                         fetch('http://' + h + '/cgi-bin/luci/?v=' + Date.now(), { mode: 'no-cors', cache: 'no-store' })
