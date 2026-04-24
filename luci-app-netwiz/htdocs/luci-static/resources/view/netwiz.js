@@ -113,6 +113,7 @@ var T = {
     'M_SUCC_MSG1': _('Since the IP has changed to {ip},'),
     'M_SUCC_MSG2': _('the system will attempt to redirect to the new address in 15 seconds.'),
     'M_SUCC_MSG3': _('Note: You will need to log in again.'),
+    'M_SUCC_MSG4': _('<b style="color:#ef4444;">Please note:</b> If you do not successfully log in to the new IP within 2 minutes, the system will automatically restore the original settings.'),
     'M_RST_TIT': _('Applying Configuration'),
     'M_RST_MSG': _('Underlying network is resetting, please wait...<br><br><span style="font-size: 14px; color: #555;">(If it does not automatically return in 15s, manually refresh)</span>'),
     'M_FAIL_TIT': _('❌ Write Failed'),
@@ -510,7 +511,7 @@ return view.extend({
                 var h = window.location.hostname, ts = new Date().getTime();
                 // 若修改了 LAN IP，尝试重定向至新地址
                 if (selectedMode === 'lan' && a1 && a1 !== h) { 
-                    var succHtml = T['M_SUCC_MSG1'].replace('{ip}', '<b style="color:#3b82f6;">' + a1 + '</b>') + '<br>' + T['M_SUCC_MSG2'] + '<br><br><small>' + T['M_SUCC_MSG3'] + '</small>';
+                    var succHtml = T['M_SUCC_MSG1'].replace('{ip}', '<b style="color:#3b82f6;">' + a1 + '</b>') + '<br>' + T['M_SUCC_MSG2'] + '<br><br><small>' + T['M_SUCC_MSG3'] + '</small><br><br><div style="background:#fef2f2; border:1px solid #fecaca; color:#ef4444; padding:10px; border-radius:8px; font-size:13px; line-height:1.5;">' + T['M_SUCC_MSG4'] + '</div>';
                     openModal({ title: T['M_SUCC_TIT'], msg: succHtml, spin: true }); 
                     setTimeout(function() { window.location.href = 'http://' + a1 + '?v=' + ts; }, 15000);
                 } else { 
