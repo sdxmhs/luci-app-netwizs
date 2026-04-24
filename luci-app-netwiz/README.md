@@ -44,6 +44,19 @@ It is designed to be highly user-friendly for novices setting up secondary route
    
    * You have a main router providing Wi-Fi and DHCP for your home. You add a bypass router and set only your laptop’s gateway to it. Now, your laptop’s traffic goes through the bypass router (e.g., for proxy or special routing), while all other devices continue using the main router normally. This way, you get advanced control on one device without affecting the rest of the network.
 
+### 💡 Execution Permissions Requirement (For GitHub Actions / Documentation)**
+
+**Required Executable Permissions (chmod +x):**
+
+To ensure the backend daemons and RPC interfaces function correctly, the following files must have executable permissions assigned before building the package:
+
+```bash
+chmod +x luci-app-netwiz/root/usr/libexec/rpcd/netwiz
+chmod +x luci-app-netwiz/root/usr/libexec/netwiz-autodetect.sh
+chmod +x luci-app-netwiz/root/usr/libexec/netwiz-monitor-loop.sh
+chmod +x luci-app-netwiz/root/etc/init.d/netwiz-monitor
+chmod +x luci-app-netwiz/root/etc/init.d/netwiz-recovery
+```
 ---
 
 ```bash
