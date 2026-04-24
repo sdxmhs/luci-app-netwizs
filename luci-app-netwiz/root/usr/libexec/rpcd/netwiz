@@ -1,6 +1,12 @@
 #!/bin/sh
 # Copyright (C) 2026 huchd0 <https://github.com/huchd0/luci-app-netwiz>
 # Licensed under the GNU General Public License v3.0
+LOG_FILE="/tmp/netwiz.log"
+
+log() {
+    echo "$(date '+%F %T') [RPC] $1" >> "$LOG_FILE"
+}
+
 case "$1" in
     list)
         echo '{ "set_network": { "mode": "string", "arg1": "string", "arg2": "string", "arg3": "string", "arg4": "string" }, "confirm": {} }'
@@ -8,16 +14,13 @@ case "$1" in
         ;;
     call)
         case "$2" in
-            # 前端页面成功加载时，会调用此接口拆弹
             confirm)
-                if [ -f /tmp/netwiz_pending_confirm ]; then
-                    rm -f /tmp/netwiz_pending_confirm /tmp/network.netwiz_bak /tmp/dhcp.netwiz_bak
-                    logger -t Netwiz "SUCCESS: Bomb defused by frontend."
-                    echo '{"result":0}'
-                else
-                    logger -t Netwiz "WARNING: Confirm called but no pending bomb found."
-                    echo '{"result":0}'
+                # 前端发来确认信号，立刻撕毁炸弹纸条
+                if [ -f /tmp/netwiz_rollback_time ]; then
+                    rm -f /tmp/netwiz_rollback_time /tmp/network.netwiz_bak /tmp/dhcp.netwiz_bak
+                    log "SUCCESS: Frontend accessed new IP. Bomb defused."
                 fi
+                echo '{"result":0}'
                 exit 0
                 ;;
                 
@@ -35,41 +38,15 @@ case "$1" in
                     uci set dhcp.lan.ignore='0'
                 }
                 
-                # （省略前面的清理逻辑）
                 CURRENT_LAN_IP=$(uci -q get network.lan.ipaddr | cut -d/ -f1)
 
                 if [ "$mode" = "lan" ] && [ -n "$arg1" ] && [ "$arg1" != "$CURRENT_LAN_IP" ]; then
-                    logger -t Netwiz "LAN IP changed to $arg1. Arming 2-min radar bomb."
-                    
+                    log "LAN IP changed to $arg1. Arming 120s bomb."
                     cp /etc/config/network /tmp/network.netwiz_bak
                     cp /etc/config/dhcp /tmp/dhcp.netwiz_bak
                     
-                    # 生成炸弹脚本（自带 netstat 雷达）
-                    cat << 'EOF' > /tmp/netwiz_rollback_task.sh
-#!/bin/sh
-TARGET_LAN_IP="$1"
-sleep 10
-# 扫描 110 次，大约 2 分钟
-for i in $(seq 1 110); do
-    # 🌟 雷达扫描：只要看到有设备连上了新 IP 的网页端口，立刻安全拆弹！
-    if netstat -tn 2>/dev/null | grep -E "(^|[ \t:])${TARGET_LAN_IP}:(80|443)[ \t]+.*ESTABLISHED" >/dev/null; then
-        logger -t Netwiz "SUCCESS: Browser access detected on $TARGET_LAN_IP. Bomb defused."
-        rm -f /tmp/network.netwiz_bak /tmp/dhcp.netwiz_bak /tmp/netwiz_rollback_task.sh
-        exit 0
-    fi
-    sleep 1
-done
-
-# 时间到，回退
-logger -t Netwiz "Rollback triggered! No web access to $TARGET_LAN_IP detected within 2 minutes."
-cp /tmp/network.netwiz_bak /etc/config/network
-cp /tmp/dhcp.netwiz_bak /etc/config/dhcp
-rm -f /tmp/network.netwiz_bak /tmp/dhcp.netwiz_bak /tmp/netwiz_rollback_task.sh
-/etc/init.d/network restart
-EOF
-                    chmod +x /tmp/netwiz_rollback_task.sh
-                    # 把炸弹扔进后台并启动
-                    /tmp/netwiz_rollback_task.sh "$arg1" </dev/null >/dev/null 2>&1 &
+                    # 🌟 核心：计算当前时间 + 120秒 的时间戳，存入倒计时文件
+                    echo $(($(date +%s) + 120)) > /tmp/netwiz_rollback_time
                 fi
 
                 if [ "$mode" = "wan_dhcp" ]; then
