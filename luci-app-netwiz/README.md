@@ -55,12 +55,12 @@ luci-app-netwiz/
 │           └── view/
 │               └── netwiz.js              # Pure frontend JS code
 ├── root/
-│   ├── etc/                               # 🌟 [NEW] System-level config directory(WIP)
+│   ├── etc/                               # 🌟 System-level config directory
 │   │   ├── hotplug.d/
-│   │   │   └── iface/
-│   │   │       └── 99-netwiz-autoswitch   # 🌟 1. WAN cable hotplug listener(WIP)
+│   │   │   └── net/
+│   │   │       └── 99-netwiz-autoswitch   # 🌟 1. WAN cable hotplug listener
 │   │   └── init.d/
-│   │       └── netwiz-recovery            # 🌟 2. Power-loss fail-safe recovery service (Requires chmod +x)(WIP)
+│   │       └── netwiz-recovery            # 🌟 2. Power-loss fail-safe recovery service (Requires chmod +x)
 │   └── usr/
 │       ├── libexec/
 │       │   ├── netwiz-autodetect.sh       # 🌟 3. Core auto-detection logic engine (Requires chmod +x)
