@@ -138,7 +138,10 @@ var T = {
     'MSG_KNOCKING': _('Knocking on the new IP door... Elapsed: {sec}s'),
     'MSG_WAIT_NET': _('Waiting for network service to restart... Elapsed: {sec}s'),
     'MSG_WAIT_OLD': _('Waiting for old IP to recover... Elapsed: {sec}s'),
-    'MSG_DEFUSING': _('New IP connected! Automatically defusing the rollback bomb...')
+    'MSG_PREP_ENV': _('Preparing environment...'),
+    'MSG_TIMER': _('Rollback countdown: <b style="color:#f59e0b;">{sec}</b> / {total} s'),
+    'MSG_SCOUT_OK': _('✅ Handshake successful'),
+    'MSG_REDIRECTING': _('Network connected! Automatically redirecting...')
 };
 
 // 声明后端的 RPC 接口调用
