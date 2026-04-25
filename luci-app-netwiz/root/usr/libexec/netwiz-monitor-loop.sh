@@ -65,9 +65,8 @@ while true; do
         LAST_WAN_STATE="$CURRENT_WAN_STATE"
     fi
 
-    # --- 2. LAN 接口防失联雷达与炸弹 (方案 B：持久化版) ---
+    # --- 2. LAN 接口防失联雷达与炸弹 ---
     if [ -f /tmp/netwiz_rollback_time ] && [ -f /tmp/netwiz_target_ip ]; then
-        # 获取目标 IP
         # 获取我们刚刚修改的最新目标 IP
         TARGET_IP=$(cat /tmp/netwiz_target_ip 2>/dev/null)
         
@@ -76,17 +75,17 @@ while true; do
 
         # 阈值设为 1：过滤单线程探针，完美捕捉真实浏览器并发加载
         if [ "$conns" -ge 1 ]; then
-            log "成功：雷达检测到浏览器成功并发加载了新 IP ($TARGET_IP) 的页面，自动拆除炸弹"
+            log "成功：雷达检测到浏览器成功加载了新 IP ($TARGET_IP) 的页面，自动拆除炸弹"
             rm -f /tmp/netwiz_rollback_time /tmp/netwiz_target_ip /etc/config/network.netwiz_bak /etc/config/dhcp.netwiz_bak
         else
             log "雷达扫描：等待用户浏览器跳转至新 IP (当前目标连接数: $conns)"
-        fi
             
-            # 检查时间是否到期
-            TARGET_TIME=$(cat /tmp/netwiz_rollback_time)
+            # 只有雷达没抓到时，才去读文件和判断时间
+            TARGET_TIME=$(cat /tmp/netwiz_rollback_time 2>/dev/null)
             CURRENT_TIME=$(date +%s)
             
-            if [ "$CURRENT_TIME" -ge "$TARGET_TIME" ]; then
+            # 增加 -n "$TARGET_TIME" 判断，防止极端情况下的空变量报错
+            if [ -n "$TARGET_TIME" ] && [ "$CURRENT_TIME" -ge "$TARGET_TIME" ]; then
                 log "时间到！未检测到有效连接，开始执行回退"
                 rm -f /tmp/netwiz_rollback_time /tmp/netwiz_target_ip
                 
@@ -104,7 +103,7 @@ while true; do
                         /etc/init.d/dnsmasq restart
                         /etc/init.d/uhttpd restart
                         sleep 3
-                        echo "$(date '+%F %T') [Monitor] 回退操作已全部完成" >> /tmp/netwiz.log
+                        echo "$(date '+%F %T') [Monitor] 回退操作已全部完成" >> /etc/netwiz.log
                     ) &
                 fi
             fi
