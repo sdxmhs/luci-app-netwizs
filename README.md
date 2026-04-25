@@ -129,7 +129,7 @@ rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
 opkg install /tmp/luci-app-netwiz.ipk
 rm -f /tmp/luci-indexcache /tmp/luci-modulecache/* && /etc/init.d/rpcd restart
 ```
-**请使用 SSH（例如 PuTTY、Xshell 或 macOS/Linux 的 Terminal）登录到您的路由器后台，然后就可以使用以下命令查看 Netwiz 专属日志了：**
+**使用 SSH（例如 PuTTY、Xshell 或 macOS/Linux 的 Terminal）登录，可以使用以下命令查看 Netwiz 专属日志：**
 
 📁 **1、查看 Netwiz 专属日志 (/etc/netwiz.log)**
 
@@ -153,7 +153,7 @@ grep "失败" /etc/netwiz.log
 
 🌐 2. 查看 OpenWrt 全局系统日志
 
-**我们在 netwiz-recovery 脚本里，为了方便在系统层面预警，日志会进入 OpenWrt 的全局系统日志中。**
+**为了方便在系统层面预警，还会进入 OpenWrt 的全局系统日志。**
 
 **只过滤查看 Netwiz 相关的系统日志：**
 ```bash
