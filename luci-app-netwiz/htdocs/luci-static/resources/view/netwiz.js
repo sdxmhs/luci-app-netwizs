@@ -393,7 +393,19 @@ return view.extend({
                     var wProto = safeUciGet('network', 'wan', 'proto', '').toLowerCase();
                     var activeWan = ifaces.find(function(i) { return i && (i.interface === 'wan' || i.proto === wProto || i.device === 'eth0' || i.device === 'wan'); }) || {};
                     var liveWanIp = ((activeWan['ipv4-address'] && activeWan['ipv4-address'][0]) ? activeWan['ipv4-address'][0].address : '').split('/')[0];
-                    var liveGw = activeWan.nexthop || (activeWan['ipv4-address'] && activeWan['ipv4-address'][0] ? activeWan['ipv4-address'][0].ptpaddress : '') || T['TXT_GETTING'];
+
+                    // 网关抓取(兼容 Static, DHCP, PPPoE)
+                    var liveGw = activeWan.nexthop || '';
+                    // 如果根目录没有，去路由表里找目标为 0.0.0.0 的默认网关 (DHCP)
+                    if (!liveGw && Array.isArray(activeWan.route)) { 
+                        var defaultRoute = activeWan.route.find(function(r) { return r.target === '0.0.0.0'; }); 
+                        if (defaultRoute) liveGw = defaultRoute.nexthop; 
+                    }
+                    // 尝试找点对点地址 (PPPoE)
+                    if (!liveGw && activeWan['ipv4-address'] && activeWan['ipv4-address'][0]) {
+                        liveGw = activeWan['ipv4-address'][0].ptpaddress || '';
+                    }
+                    liveGw = liveGw || T['TXT_GETTING'];
                     var wIp = safeUciGet('network', 'wan', 'ipaddr', T['TXT_NOT_GOT']).split('/')[0], wGw = safeUciGet('network', 'wan', 'gateway', T['TXT_NOT_SET']); 
                     var lIp = safeUciGet('network', 'lan', 'ipaddr', window.location.hostname).split('/')[0], lGw = safeUciGet('network', 'lan', 'gateway', T['TXT_NOT_SET']), lIgnore = safeUciGet('dhcp', 'lan', 'ignore', ''), isBypass = (lIgnore === '1' || lIgnore === 'true' || lIgnore === 'on' || lIgnore === 'yes');
 
