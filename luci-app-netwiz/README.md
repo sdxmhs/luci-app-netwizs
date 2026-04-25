@@ -54,17 +54,19 @@ chmod +x luci-app-netwiz/root/etc/init.d/netwiz-recovery
 
 ```bash
 luci-app-netwiz/
-├── Makefile                          # standard Makefile (package definition, dependencies)
+├── Makefile                              # OpenWrt standard Makefile (package definition, dependencies)
+├── LICENSE                              # Open-source license (declares code usage rights)
+├── Makefile                             # OpenWrt/ImmortalWrt standard Makefile (package definition, dependencies)
 ├── htdocs/
 │   └── luci-static/
 │       └── resources/
 │           └── view/
-│               └── netwiz.js         # Frontend UI (Async radar, dynamic stopwatch, JS logic)
+│               └── netwiz.js             # Frontend UI (Async radar, dynamic stopwatch, JS logic)
 ├── po/
 │   ├── zh_Hans/
 │   │   └── netwiz.po                 # Simplified Chinese translation dictionary
 │   └── zh_Hant/
-│       └── netwiz.po                 # Traditional Chinese translation dictionary
+│       └── netwiz.po                  # Traditional Chinese translation dictionary
 └── root/
     ├── etc/
     │   ├── init.d/
