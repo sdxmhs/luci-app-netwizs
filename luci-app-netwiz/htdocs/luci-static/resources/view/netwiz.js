@@ -149,14 +149,14 @@ var callNetSetup = rpc.declare({
     expect: { result: 0 }
 });
 
-// 🌟 新增：声明主动拆弹接口
+// 声明主动取消定时装置接口
 var callNetDefuse = rpc.declare({
     object: 'netwiz',
     method: 'confirm',
     expect: { result: 0 }
 });
 
-// 获取外网連線狀態的 RPC 接口
+// 获取外网连线状态的 RPC 接口
 var getWanStatus = rpc.declare({
     object: 'network.interface',
     method: 'dump',
@@ -551,18 +551,18 @@ return view.extend({
                         document.getElementById('nw-global-msg').innerHTML = knockingMsg;
 
                         if (elapsed < bombTime) {
-                            // 探活与自动拆弹逻辑
+                            // 探活与自动取消定时装置逻辑
                             fetch('http://' + a1 + '/luci-static/resources/view/netwiz.js?v=' + ts, { mode: 'no-cors', cache: 'no-store' })
                             .then(function() {
                                 clearInterval(checkNewIpTimer);
                                 
-                                // 探活成功！显示正在拆除炸弹的提示
+                                // 探活成功！显示正在取消定时装置的提示
                                 document.getElementById('nw-global-msg').innerHTML = '<div style="font-size: 16px; margin-bottom: 10px;">' + T['LBL_TARGET'] + ' <b style="color:#3b82f6;">' + a1 + '</b></div><div style="color: #f59e0b; font-size: 16px; font-weight: bold;">' + T['MSG_DEFUSING'] + '</div>';
                                 
-                                // 强制前端发送 confirm RPC 指令，让后端拆除 120 秒回退炸弹
+                                // 强制前端发送 confirm RPC 指令，让后端拆除 120 秒回退定时装置
                                 // 如果这行代码因为网络策略没发出去，后端的 netstat 并发雷达作为保底，会在跳转后触发
                                 callNetDefuse().then(function() {
-                                    // 拆弹指令发送成功，跳转到新地址
+                                    // 取消定时装置指令发送成功，跳转到新地址
                                     window.location.href = 'http://' + a1 + '/cgi-bin/luci/';
                                 }).catch(function() {
                                     // 即使 RPC 失败，也强行跳转，后端的并发雷达保底
