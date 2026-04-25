@@ -65,34 +65,34 @@ chmod +x luci-app-netwiz/root/etc/init.d/netwiz-recovery
 
 ```bash
 luci-app-netwiz/
-├── Makefile                              # OpenWrt standard Makefile (package definition, dependencies)
-├── LICENSE                               # Open-source license (declares code usage rights)
-├── Makefile                              # OpenWrt/ImmortalWrt standard Makefile (package definition, dependencies)
+├── Makefile                                 # OpenWrt standard Makefile (package definition, dependencies)
+├── LICENSE                                  # Open-source license (declares code usage rights)
+├── Makefile                                 # OpenWrt/ImmortalWrt standard Makefile (package definition, dependencies)
 ├── htdocs/
 │   └── luci-static/
 │       └── resources/
 │           └── view/
-│               └── netwiz.js             # Frontend UI (Async radar, dynamic stopwatch, JS logic)
+│               └── netwiz.js                # Frontend UI (Async radar, dynamic stopwatch, JS logic)
 ├── po/
 │   ├── zh_Hans/
-│   │   └── netwiz.po                 # Simplified Chinese translation dictionary
+│   │   └── netwiz.po                        # Simplified Chinese translation dictionary
 │   └── zh_Hant/
-│       └── netwiz.po                  # Traditional Chinese translation dictionary
+│       └── netwiz.po                        # Traditional Chinese translation dictionary
 └── root/
     ├── etc/
     │   ├── init.d/
-    │   │   ├── netwiz-monitor        # Background daemon service for the monitor loop
-    │   │   └── netwiz-recovery       # Power-loss auto-recovery service (START=15)
+    │   │   ├── netwiz-monitor               # Background daemon service for the monitor loop
+    │   │   └── netwiz-recovery              # Power-loss auto-recovery service (START=15)
     │   └── share/
     │       └── rpcd/
     │           └── acl.d/
     │               └── luci-app-netwiz.json # RPC Access Control List (CRITICAL for frontend permissions)
     └── usr/
         ├── libexec/
-        │   ├── netwiz-autodetect.sh  # WAN protocol auto-detection engine (DHCP/PPPoE)
-        │   ├── netwiz-monitor-loop.sh# Core monitor daemon (Debounce, connection radar, rollback)
+        │   ├── netwiz-autodetect.sh         # WAN protocol auto-detection engine (DHCP/PPPoE)
+        │   ├── netwiz-monitor-loop.sh       # Core monitor daemon (Debounce, connection radar, rollback)
         │   └── rpcd/
-        │       └── netwiz            # Backend RPC interface (receives UI commands, writes configs)
+        │       └── netwiz                   # Backend RPC interface (receives UI commands, writes configs)
         └── share/
             └── luci/
                 └── menu.d/
