@@ -1,5 +1,5 @@
 {
-	"admin/system/netwiz": {
+	"admin/netwiz": {
 		"title": "Network Wizard",
 		"order": 1,
 		"action": {
