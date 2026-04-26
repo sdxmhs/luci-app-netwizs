@@ -394,9 +394,6 @@ msgstr "✅ 偵察握手成功"
 msgid "Network connected! Automatically redirecting..."
 msgstr "網路已連通！正在為您自動跳轉..."
 
-msgid "Force Apply (Recommended OFF)"
-msgstr "強制生效"
-
 msgid "If enabled, the 120s rollback timer is bypassed."
 msgstr "開啟後跳過 120 秒防失聯機制，配置立刻生效。"
 
