@@ -36,7 +36,7 @@ var T = {
     'PH_PASS': _('Enter PPPoE password'),
     'TITLE_LAN': _('Configure LAN'),
     'LBL_FORCE_APPLY': _('Bypass Safe Mode(Recommended OFF)'),
-    'DESC_FORCE_APPLY': _('If enabled, the 120s rollback timer is bypassed, and changes apply immediately.'),
+    'DESC_FORCE_APPLY': _('If enabled, the 120s rollback timer is bypassed.'),
     'MSG_SAFE_OFF': _('Safe mode bypassed. Applying immediately...'),
     'LBL_BYPASS': _('Enable Bypass Mode'),
     'WARN_BYPASS': _('<b style="font-size: 16px;">Bypass Mode Enabled:</b><br>1. DHCP will be disabled. <b style="color: #059669;">Devices must use static IPs or get IPs from upstream.</b><br>2. Gateway MUST be the upstream router IP.<br>3. If LAN IP changes, ensure your client is in the same subnet to avoid <b style="color: #059669;">losing access</b>.'),
