@@ -21,9 +21,8 @@ case "$1" in
         case "$2" in
             confirm)
                 if [ -f /tmp/netwiz_rollback_time ] || [ -f /tmp/netwiz_target_ip ]; then
-                    # 备份 set_network 分支同步改為 /tmp
                     rm -f /tmp/netwiz_rollback_time /tmp/netwiz_target_ip /tmp/network.netwiz_bak /tmp/dhcp.netwiz_bak
-                    log "成功：前端主动下发确认指令，已手动拆除回退定时裝置"
+                    log "成功：已手动拆除回退定时装置"
                 fi
                 echo '{"result":0}'
                 exit 0
@@ -37,10 +36,9 @@ case "$1" in
                 arg4=$(echo "$input" | jsonfilter -e '@.arg4')
                 arg5=$(echo "$input" | jsonfilter -e '@.arg5')
 
-                # 只允许数字和点，不允許 / 或命令注入
                 validate_strict_ip() {
                     if [ -n "$1" ] && ! echo "$1" | grep -Eq '^[0-9.]+$'; then
-                        log "安全拦截：参数 '$1' 包含非法字元，已拒绝操作"
+                        log "安全拦截：参数 '$1' 包含非法字符"
                         echo '{"result":1,"error":"Invalid format"}'
                         exit 1
                     fi
@@ -60,43 +58,35 @@ case "$1" in
 
                 if [ "$mode" = "lan" ] && [ -n "$arg1" ] && [ "$arg1" != "$CURRENT_LAN_IP" ]; then
                     if [ "$arg5" != "0" ]; then
-                        log "LAN IP 修改為 $arg1，安放 120 秒回退定時裝置"
-                        # 放在 /tmp 下
+                        log "LAN IP 修改为 $arg1，安放 120 秒回退装置"
                         cp /etc/config/network /tmp/network.netwiz_bak
                         cp /etc/config/dhcp /tmp/dhcp.netwiz_bak
                         echo "$arg1" > /tmp/netwiz_target_ip
                         echo $(($(date +%s) + 120)) > /tmp/netwiz_rollback_time
                     else
-                        log "LAN IP 修改為 $arg1，(直接生效模式) 跳過定时裝置"
+                        log "LAN IP 修改为 $arg1，直接生效模式"
                     fi
                 fi
 
                 if [ "$mode" = "wan_dhcp" ]; then
                     cleanup_lan_for_wan_modes
                     uci set network.wan.proto='dhcp'
-                    uci commit network; uci commit dhcp
                 elif [ "$mode" = "wan_static" ]; then
                     cleanup_lan_for_wan_modes
                     uci set network.wan.proto='static'
                     uci set network.wan.ipaddr="$arg1"
                     uci set network.wan.gateway="$arg2"
                     uci set network.wan.netmask="$arg3"
-                    uci commit network; uci commit dhcp
                 elif [ "$mode" = "pppoe" ]; then
                     cleanup_lan_for_wan_modes
                     uci set network.wan.proto='pppoe'
                     uci set network.wan.username="$arg1"
                     uci set network.wan.password="$arg2"
-                    uci commit network; uci commit dhcp
                 elif [ "$mode" = "lan" ]; then
                     uci set network.lan.proto='static'
                     uci set network.lan.ipaddr="$arg1"
                     uci set network.lan.netmask="$arg3"
-                    if [ -n "$arg2" ]; then
-                        uci set network.lan.gateway="$arg2"
-                    else
-                        uci delete network.lan.gateway 2>/dev/null
-                    fi
+                    [ -n "$arg2" ] && uci set network.lan.gateway="$arg2" || uci delete network.lan.gateway 2>/dev/null
                     if [ "$arg4" = "1" ]; then
                         uci set dhcp.lan.ignore='1'
                         [ -n "$arg2" ] && uci set network.lan.dns="$arg2"
@@ -104,9 +94,8 @@ case "$1" in
                         uci set dhcp.lan.ignore='0'
                         uci delete network.lan.dns 2>/dev/null
                     fi
-                    uci commit network; uci commit dhcp
                 fi
-                
+                uci commit network; uci commit dhcp
                 echo '{"result":0}'
                 ( exec >/dev/null 2>&1 </dev/null; sleep 3; /etc/init.d/network restart; /etc/init.d/dnsmasq restart; /etc/init.d/uhttpd restart ) &
                 exit 0
