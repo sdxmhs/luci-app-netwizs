@@ -383,6 +383,19 @@ return view.extend({
 
             // --- 分开独立面板 ---
             '        <div id="wifi-split-ui" style="display: block;">',
+            
+            // 🌟 新增：全局 2.4G / 5G 开关区域（始终可见）
+            '           <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">',
+            '              <div style="flex:1; min-width:140px; display:flex; align-items:center; justify-content:space-between; padding:12px 15px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">',
+            '                 <label class="nw-value-title" style="margin:0 !important; font-size:14px;">{{LBL_WIFI_2G_EN}}</label>',
+            '                 <label class="nw-switch" style="flex-shrink:0;"><input type="checkbox" id="wifi-2g-en" checked><span class="nw-slider"></span></label>',
+            '              </div>',
+            '              <div style="flex:1; min-width:140px; display:flex; align-items:center; justify-content:space-between; padding:12px 15px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">',
+            '                 <label class="nw-value-title" style="margin:0 !important; font-size:14px;">{{LBL_WIFI_5G_EN}}</label>',
+            '                 <label class="nw-switch" style="flex-shrink:0;"><input type="checkbox" id="wifi-5g-en" checked><span class="nw-slider"></span></label>',
+            '              </div>',
+            '           </div>',
+
             '           <div id="wifi-tab-buttons" style="display:flex; gap:10px; margin-bottom:15px;">',
             '              <button id="tab-2g" style="flex:1; padding:10px; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">{{TAB_2G}}</button>',
             '              <button id="tab-5g" style="flex:1; padding:10px; background:#f1f5f9; color:#475569; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">{{TAB_5G}}</button>',
@@ -390,10 +403,7 @@ return view.extend({
             
             // --- 2.4G 面板 ---
             '           <div id="wifi-2g-form">',
-            '              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0 15px 0; border-bottom: 1px dashed #e2e8f0; margin-bottom: 15px;">',
-            '                 <label class="nw-value-title" style="margin:0 !important;">{{LBL_WIFI_2G_EN}}</label>',
-            '                 <label class="nw-switch" style="flex-shrink:0;"><input type="checkbox" id="wifi-2g-en" checked><span class="nw-slider"></span></label>',
-            '              </div>',
+            // （此处已移除原本内部的 2.4G 开关）
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_SSID}} (2.4G)</label><div class="nw-value-field"><input type="text" id="wifi-2g-ssid"></div></div>',
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_WIFI_PASS}} (2.4G)</label><div class="nw-value-field"><input type="text" id="wifi-2g-key"></div></div>',
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_WIFI_ENC}}</label><div class="nw-value-field">',
@@ -423,10 +433,7 @@ return view.extend({
 
             // --- 5G 面板 ---
             '           <div id="wifi-5g-form" style="display:none;">',
-            '              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0 15px 0; border-bottom: 1px dashed #e2e8f0; margin-bottom: 15px;">',
-            '                 <label class="nw-value-title" style="margin:0 !important;">{{LBL_WIFI_5G_EN}}</label>',
-            '                 <label class="nw-switch" style="flex-shrink:0;"><input type="checkbox" id="wifi-5g-en" checked><span class="nw-slider"></span></label>',
-            '              </div>',
+            // （此处已移除原本内部的 5G 开关）
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_SSID}} (5G)</label><div class="nw-value-field"><input type="text" id="wifi-5g-ssid"></div></div>',
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_WIFI_PASS}} (5G)</label><div class="nw-value-field"><input type="text" id="wifi-5g-key"></div></div>',
             '              <div class="nw-value"><label class="nw-value-title">{{LBL_WIFI_ENC}}</label><div class="nw-value-field">',
@@ -447,7 +454,6 @@ return view.extend({
             '              </div>',
             '           </div>',
             '        </div>',
-            '      </div>',
             '      <div id="fields-lan" style="display: none;">',
             '        <div class="nw-step-title">{{TITLE_LAN}}</div>',
             '        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 15px;">',
