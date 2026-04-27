@@ -1084,35 +1084,35 @@ return view.extend({
                                 var isEn = container.querySelector('#wifi-smart-en').checked;
                                 confirmList.push([T['LBL_SMART_CONN'], isEn ? '<b style="color:#10b981;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>']);
                                 if (isEn) {
-                                    confirmList.push(['SSID', '<span style="font-weight:bold;">' + container.querySelector('#wifi-smart-ssid').value + '</span>']);
-                                    confirmList.push([T['LBL_WIFI_ENC'], getSelTxt('#wifi-smart-enc')]);
+                                    confirmList.push(['<span style="color:#ffffff; font-weight:500;">SSID</span>', '<span style="font-weight:bold; color:#ffffff;">' + container.querySelector('#wifi-smart-ssid').value + '</span>']);
+                                    confirmList.push(['<span style="color:#ffffff; font-weight:500;">' + T['LBL_WIFI_ENC'] + '</span>', '<span style="color:#ffffff;">' + getSelTxt('#wifi-smart-enc') + '</span>']);
                                     if (container.querySelector('#wifi-smart-enc').value !== 'none') {
-                                        confirmList.push(['802.11k/v/r 漫游', '<span style="color:#10b981;">' + T['TXT_ON'] + '</span>']);
+                                        confirmList.push(['<span style="color:#ffffff; font-weight:500;">802.11k/v/r 漫游</span>', '<span style="color:#10b981; font-weight:bold;">' + T['TXT_ON'] + '</span>']);
                                     }
                                     if (container.querySelector('#wifi-smart-hidden').checked) {
-                                        confirmList.push([T['LBL_HIDE_SSID'], T['TXT_ON']]);
+                                        confirmList.push(['<span style="color:#ffffff; font-weight:500;">' + T['LBL_HIDE_SSID'] + '</span>', '<span style="color:#ffffff; font-weight:bold;">' + T['TXT_ON'] + '</span>']);
                                     }
                                 }
                             } else {
                                 var en2g = container.querySelector('#wifi-2g-en').checked;
-                                confirmList.push(['<b style="color:#facc15;">' + T['TAB_2G'] + '</b>', en2g ? '<b style="color:#10b981;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>']);
+                                confirmList.push(['<b style="color:#fde047; font-size:15px;">' + T['TAB_2G'] + '</b>', en2g ? '<b style="color:#10b981;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>']);
                                 if (en2g) {
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ SSID</span>', '<span style="font-weight:bold;">' + container.querySelector('#wifi-2g-ssid').value + '</span>']);
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ ' + T['LBL_WIFI_ENC'] + '</span>', getSelTxt('#wifi-2g-enc')]);
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ ' + T['LBL_CHANNEL'] + '</span>', getSelTxt('#wifi-2g-chan') + ' (' + getSelTxt('#wifi-2g-bw') + ')']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ SSID</span>', '<span style="font-weight:bold; color:#ffffff;">' + container.querySelector('#wifi-2g-ssid').value + '</span>']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ ' + T['LBL_WIFI_ENC'] + '</span>', '<span style="color:#ffffff;">' + getSelTxt('#wifi-2g-enc') + '</span>']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ ' + T['LBL_CHANNEL'] + '</span>', '<span style="color:#ffffff;">' + getSelTxt('#wifi-2g-chan') + ' (' + getSelTxt('#wifi-2g-bw') + ')</span>']);
                                     if (container.querySelector('#wifi-2g-enc').value !== 'none') {
-                                        confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ 802.11r 漫游</span>', '<span style="color:#10b981;">' + T['TXT_ON'] + '</span>']);
+                                        confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ 802.11r 漫游</span>', '<span style="color:#10b981; font-weight:bold;">' + T['TXT_ON'] + '</span>']);
                                     }
                                 }
                                 
                                 var en5g = container.querySelector('#wifi-5g-en').checked;
-                                confirmList.push(['<b style="color:#60a5fa;">' + T['TAB_5G'] + '</b>', en5g ? '<b style="color:#10b981;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>']);
+                                confirmList.push(['<b style="color:#67e8f9; font-size:15px;">' + T['TAB_5G'] + '</b>', en5g ? '<b style="color:#10b981;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>']);
                                 if (en5g) {
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ SSID</span>', '<span style="font-weight:bold;">' + container.querySelector('#wifi-5g-ssid').value + '</span>']);
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ ' + T['LBL_WIFI_ENC'] + '</span>', getSelTxt('#wifi-5g-enc')]);
-                                    confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ ' + T['LBL_CHANNEL'] + '</span>', getSelTxt('#wifi-5g-chan') + ' (' + getSelTxt('#wifi-5g-bw') + ')']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ SSID</span>', '<span style="font-weight:bold; color:#ffffff;">' + container.querySelector('#wifi-5g-ssid').value + '</span>']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ ' + T['LBL_WIFI_ENC'] + '</span>', '<span style="color:#ffffff;">' + getSelTxt('#wifi-5g-enc') + '</span>']);
+                                    confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ ' + T['LBL_CHANNEL'] + '</span>', '<span style="color:#ffffff;">' + getSelTxt('#wifi-5g-chan') + ' (' + getSelTxt('#wifi-5g-bw') + ')</span>']);
                                     if (container.querySelector('#wifi-5g-enc').value !== 'none') {
-                                        confirmList.push(['<span style="padding-left:12px; color:#cbd5e1;">└ 802.11r 漫游</span>', '<span style="color:#10b981;">' + T['TXT_ON'] + '</span>']);
+                                        confirmList.push(['<span style="padding-left:12px; color:#ffffff; font-weight:500; opacity:0.95;">└ 802.11r 漫游</span>', '<span style="color:#10b981; font-weight:bold;">' + T['TXT_ON'] + '</span>']);
                                     }
                                 }
                             }
