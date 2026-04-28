@@ -27,43 +27,45 @@ jobs:
         run: |
           INPUT_VER="${{ github.event.inputs.new_version }}"
           
-          # 先统一提取当前的 Makefile 版本号备用
+          # 提取当前 Makefile 版本号备用
           PKG_VER=$(grep -m 1 -E '^PKG_VERSION[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
           PKG_REL=$(grep -m 1 -E '^PKG_RELEASE[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
           
           if [ -z "$INPUT_VER" ]; then
-            # 留空：不修改代码，拼接完整版本号并直接进入编译发版
-            if [ -n "$PKG_REL" ]; then
-               FULL_VER="${PKG_VER}-${PKG_REL}"
-            else
-               FULL_VER="${PKG_VER}"
-            fi
+            # 留空：不修改代码，直接进入编译发版
+            if [ -n "$PKG_REL" ]; then FULL_VER="${PKG_VER}-${PKG_REL}"; else FULL_VER="${PKG_VER}"; fi
             echo "pkg_version=$FULL_VER" >> $GITHUB_OUTPUT
             echo "skip_build=false" >> $GITHUB_OUTPUT
             echo "✅ 留空输入，直接读取当前版本 v$FULL_VER 进行编译发版。"
-          else
-            # 有输入：判断是否为 0 或 1，进行自动递增 (例如 1.4.2 -> 1.4.3)
-            if [ "$INPUT_VER" = "0" ] || [ "$INPUT_VER" = "1" ]; then
-               # 使用 awk 自动将版本号以 "." 分割的最后一位数字 +1
-               TARGET_VER=$(echo "$PKG_VER" | awk -F. -v OFS=. '{$NF += 1 ; print}')
-               echo "✅ 检测到输入为 $INPUT_VER，执行自动小版本递增：$PKG_VER -> $TARGET_VER"
-            else
-               # 用户输入了具体的版本号 (比如 1.5.0)
-               TARGET_VER="$INPUT_VER"
-               echo "✅ 检测到指定版本号，准备更新至：$TARGET_VER"
-            fi
             
-            # 修改 Makefile 里的版本号
+          elif [ "$INPUT_VER" = "0" ] || [ "$INPUT_VER" = "1" ]; then
+            # 输入 0 或 1：自动递增最后一位，保存，并且【进入编译发版】！
+            TARGET_VER=$(echo "$PKG_VER" | awk -F. -v OFS=. '{$NF += 1 ; print}')
+            echo "✅ 自动递增版本号：$PKG_VER -> $TARGET_VER"
+            
             sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TARGET_VER/g" luci-app-netwiz/Makefile
-            
-            # 提交并推送到 Github 仓库保存
             git config --local user.email "actions@github.com"
             git config --local user.name "Github Actions"
             git add luci-app-netwiz/Makefile
             git commit -m "bump version to $TARGET_VER"
             git push
             
-            # 告诉后续步骤：已更新版本号，跳过本次编译
+            # 告诉后续步骤【不要跳过】，继续编译发版！
+            echo "pkg_version=$TARGET_VER" >> $GITHUB_OUTPUT
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+            
+          else
+            # 输入了具体的版本号 (例如 1.5.0)：只更新代码，【不发版】
+            TARGET_VER="$INPUT_VER"
+            echo "✅ 检测到指定版本号，准备更新至：$TARGET_VER (本次不发版)"
+            
+            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TARGET_VER/g" luci-app-netwiz/Makefile
+            git config --local user.email "actions@github.com"
+            git config --local user.name "Github Actions"
+            git add luci-app-netwiz/Makefile
+            git commit -m "bump version to $TARGET_VER"
+            git push
+            
             echo "pkg_version=$TARGET_VER" >> $GITHUB_OUTPUT
             echo "skip_build=true" >> $GITHUB_OUTPUT
           fi
