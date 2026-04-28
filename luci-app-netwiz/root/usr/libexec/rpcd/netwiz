@@ -88,18 +88,27 @@ case "$1" in
                 fi
 
                 if [ "$mode" = "wan_dhcp" ]; then
-                    cleanup_lan_for_wan_modes; uci set network.wan.proto='dhcp'
-                    uci commit network; uci commit dhcp
+                    cleanup_lan_for_wan_modes;
+                    uci set network.wan.proto='dhcp'
+                    uci commit network;
+                    uci commit dhcp
                 elif [ "$mode" = "wan_static" ]; then
-                    cleanup_lan_for_wan_modes; uci set network.wan.proto='static'
-                    uci set network.wan.ipaddr="$arg1"; uci set network.wan.gateway="$arg2"
-                    uci set network.wan.netmask="$arg3"; uci commit network; uci commit dhcp
-                elif [ "$mode" = "pppoe" ]; then
-                    cleanup_lan_for_wan_modes; uci set network.wan.proto='pppoe'
-                    uci set network.wan.username="$arg1"; uci set network.wan.password="$arg2"
+                    cleanup_lan_for_wan_modes;
+                    uci set network.wan.proto='static'
+                    uci set network.wan.ipaddr="$arg1";
+                    uci set network.wan.gateway="$arg2"
+                    uci set network.wan.netmask="$arg3";
                     uci commit network; uci commit dhcp
+                elif [ "$mode" = "pppoe" ]; then
+                    cleanup_lan_for_wan_modes;
+                    uci set network.wan.proto='pppoe'
+                    uci set network.wan.username="$arg1";
+                    uci set network.wan.password="$arg2"
+                    uci commit network;
+                    uci commit dhcp
                 elif [ "$mode" = "lan" ]; then
-                    uci set network.lan.proto='static'; uci set network.lan.ipaddr="$arg1"; uci set network.lan.netmask="$arg3"
+                    uci set network.lan.proto='static';
+                    uci set network.lan.ipaddr="$arg1"; uci set network.lan.netmask="$arg3"
                     if [ -n "$arg2" ]; then uci set network.lan.gateway="$arg2"; else uci delete network.lan.gateway 2>/dev/null; fi
                     if [ "$arg4" = "1" ]; then
                         uci set dhcp.lan.ignore='1'
@@ -116,7 +125,8 @@ case "$1" in
                         uci set dhcp.lan.ra='disabled'
                         uci set dhcp.lan.ndp='disabled'
                     fi
-                    uci commit network; uci commit dhcp
+                    uci commit network;
+                    uci commit dhcp
                 elif [ "$mode" = "wifi" ]; then
                     payload="$arg1"
                     smart=$(echo "$payload" | jsonfilter -e '@.smart' || echo "false")
@@ -150,8 +160,9 @@ case "$1" in
                         fi
                         
                         if [ "$is_5g" = "0" ]; then
-                            local current_channel=$(uci -q get wireless.$dev.channel || echo "0")
-                            local current_ht=$(uci -q get wireless.$dev.htmode | tr 'A-Z' 'a-z' || echo "")
+
+                            current_channel=$(uci -q get wireless.$dev.channel || echo "0")
+                            current_ht=$(uci -q get wireless.$dev.htmode | tr 'A-Z' 'a-z' || echo "")
                     
                             if echo "$current_ht" | grep -qE "80|160|320"; then
                                 is_5g=1
@@ -207,12 +218,15 @@ case "$1" in
                         
                         log "正在为芯片 [$dev] 注入目标配置: UI=[$ui_prefix], 启用=[$p_en], Mode=[$p_mode]"
                         
+
                         if [ "$p_en" = "0" ]; then
                             uci set wireless.$iface_name.disabled='1'
-                            log "  - [$dev] 对应接口已静默禁用"
+                            uci set wireless.$dev.disabled='1'
+                            log "  - [$dev] 对应物理网卡和接口已深度禁用"
                         else
-                            uci set wireless.$iface_name.disabled='0'
-                            uci set wireless.$dev.disabled='0'
+                            uci delete wireless.$iface_name.disabled 2>/dev/null
+                            uci delete wireless.$dev.disabled 2>/dev/null
+                            log "  - [$dev] 对应物理网卡已唤醒并启用"
                         fi
 
                         [ -n "$p_ssid" ] && uci set wireless.$iface_name.ssid="$p_ssid"
@@ -355,7 +369,8 @@ case "$1" in
                     uci commit wireless
                     log "========== Wi-Fi 写入逻辑执行完毕，准备重启网络 =========="
                     echo '{"result":0}'
-                    ( exec >/dev/null 2>&1 </dev/null; sleep 2; wifi reload ) &
+
+                    ( exec >/dev/null 2>&1 </dev/null; sleep 2; wifi up; wifi reload ) &
                     exit 0
                 fi
                 
