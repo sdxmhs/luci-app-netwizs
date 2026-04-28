@@ -26,26 +26,45 @@ jobs:
         id: version_handler
         run: |
           INPUT_VER="${{ github.event.inputs.new_version }}"
+          
+          # 先统一提取当前的 Makefile 版本号备用
+          PKG_VER=$(grep -m 1 -E '^PKG_VERSION[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
+          PKG_REL=$(grep -m 1 -E '^PKG_RELEASE[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
+          
           if [ -z "$INPUT_VER" ]; then
-            # 兼容 Makefile 中有空格的情況，並同時提取 VERSION 和 RELEASE
-            PKG_VER=$(grep -m 1 -E '^PKG_VERSION[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
-            PKG_REL=$(grep -m 1 -E '^PKG_RELEASE[ \t]*:?=' luci-app-netwiz/Makefile | cut -d '=' -f 2 | tr -d ' \t"')
-            
-            # 如果有 Release，就拼接起來 (例如 1.0.0-1)
+            # 留空：不修改代码，拼接完整版本号并直接进入编译发版
             if [ -n "$PKG_REL" ]; then
                FULL_VER="${PKG_VER}-${PKG_REL}"
             else
                FULL_VER="${PKG_VER}"
             fi
-            
             echo "pkg_version=$FULL_VER" >> $GITHUB_OUTPUT
             echo "skip_build=false" >> $GITHUB_OUTPUT
+            echo "✅ 留空输入，直接读取当前版本 v$FULL_VER 进行编译发版。"
           else
-            # ... 版本更新 ...
-            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$INPUT_VER/g" luci-app-netwiz/Makefile
+            # 有输入：判断是否为 0 或 1，进行自动递增 (例如 1.4.2 -> 1.4.3)
+            if [ "$INPUT_VER" = "0" ] || [ "$INPUT_VER" = "1" ]; then
+               # 使用 awk 自动将版本号以 "." 分割的最后一位数字 +1
+               TARGET_VER=$(echo "$PKG_VER" | awk -F. -v OFS=. '{$NF += 1 ; print}')
+               echo "✅ 检测到输入为 $INPUT_VER，执行自动小版本递增：$PKG_VER -> $TARGET_VER"
+            else
+               # 用户输入了具体的版本号 (比如 1.5.0)
+               TARGET_VER="$INPUT_VER"
+               echo "✅ 检测到指定版本号，准备更新至：$TARGET_VER"
+            fi
+            
+            # 修改 Makefile 里的版本号
+            sed -i "s/^PKG_VERSION:=.*/PKG_VERSION:=$TARGET_VER/g" luci-app-netwiz/Makefile
+            
+            # 提交并推送到 Github 仓库保存
             git config --local user.email "actions@github.com"
             git config --local user.name "Github Actions"
-            git add . && git commit -m "bump version" && git push
+            git add luci-app-netwiz/Makefile
+            git commit -m "bump version to $TARGET_VER"
+            git push
+            
+            # 告诉后续步骤：已更新版本号，跳过本次编译
+            echo "pkg_version=$TARGET_VER" >> $GITHUB_OUTPUT
             echo "skip_build=true" >> $GITHUB_OUTPUT
           fi
 
@@ -105,11 +124,12 @@ jobs:
       - name: 提取并强制分类命名
         run: |
           mkdir -p release_pkgs
-          # 分别处理主程序、简中、繁中，加上类型前缀强制排序
+          # 分别处理主程序、简中、繁中、英文，加上类型前缀强制排序
           for ext in apk ipk; do
             find bin/ -name "luci-app-netwiz*.$ext" -exec cp {} release_pkgs/${ext}_luci-app-netwiz.$ext \;
             find bin/ -name "luci-i18n-netwiz-zh-cn*.$ext" -exec cp {} release_pkgs/${ext}_luci-i18n-netwiz-zh-cn.$ext \;
             find bin/ -name "luci-i18n-netwiz-zh-tw*.$ext" -exec cp {} release_pkgs/${ext}_luci-i18n-netwiz-zh-tw.$ext \;
+            find bin/ -name "luci-i18n-netwiz-en*.$ext" -exec cp {} release_pkgs/${ext}_luci-i18n-netwiz-en.$ext \;
           done
 
       - name: 上传临时产物
@@ -154,11 +174,13 @@ jobs:
             * **所有人必装主程序**：`apk_luci-app-netwiz.apk`
             * **需要简体中文界面的用户**：额外下载 `apk_luci-i18n-netwiz-zh-cn.apk`
             * **需要繁體中文介面的用戶**：額外下載 `apk_luci-i18n-netwiz-zh-tw.apk`
+            * **需要英文界面的用户 (English)**：额外下载 `apk_luci-i18n-netwiz-en.apk`
 
             #### 📦 如果您的系统使用 IPK 格式 (传统/老固件)：
             * **所有人必装主程序**：`ipk_luci-app-netwiz.ipk`
             * **需要简体中文界面的用户**：额外下载 `ipk_luci-i18n-netwiz-zh-cn.ipk`
             * **需要繁體中文介面的用戶**：額外下載 `ipk_luci-i18n-netwiz-zh-tw.ipk`
+            * **需要英文界面的用户 (English)**：额外下载 `ipk_luci-i18n-netwiz-en.ipk`
             
             ---
             
