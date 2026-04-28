@@ -535,7 +535,7 @@ return view.extend({
         function safePromise(p, f) { return new Promise(function(r) { var t = setTimeout(function() { r(f); }, 3000); if (!p || !p.then) { clearTimeout(t); return r(f); } p.then(function(res) { clearTimeout(t); r(res); }).catch(function() { clearTimeout(t); r(f); }); }); }
         function safeUciGet(c, s, o, d) { try { var v = uci.get(c, s, o); return (v === null || v === undefined) ? d : String(v).trim(); } catch(e) { return d; } }
 
-        // 🌟 新增：智能 SSID 后缀转换引擎
+        // 智能 SSID 后缀转换
         function smartConvertSsid(ssid, toBand) {
             if (!ssid) return '';
             var s = ssid.trim();
@@ -773,7 +773,7 @@ return view.extend({
                     else { sTitle = T['STAT_LAN']; sDetails = mkD(T['TXT_LAN_IP'], lIp, T['TXT_DHCP_SRV'], T['TXT_ON']); }
                     
                     // 首页展示 Wi-Fi 与 IPv6 状态
-                    var ipv6Label = (ipv6Mode === 'server' || ipv6Mode === 'relay') ? '<b style="color:#10b981; padding: 5px 10px; background: #fff; border-radius: 10px;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444;">' + T['TXT_OFF'] + '</b>';
+                    var ipv6Label = (ipv6Mode === 'server' || ipv6Mode === 'relay') ? '<b style="color:#10b981; padding: 3px 10px; background: #fff; border-radius: 10px;">' + T['TXT_ON'] + '</b>' : '<b style="color:#ef4444; padding: 3px 10px; background: #fff; border-radius: 10px;">' + T['TXT_OFF'] + '</b>';
                     
                     var wDevsList = uci.sections('wireless', 'wifi-device') || [];
                     var wIfacesList = uci.sections('wireless', 'wifi-iface') || [];
@@ -813,16 +813,17 @@ return view.extend({
                         }
                     }
                     
-                    // 虚线的透明度0.6，整体字号 15.5px
-                    var extraInfo = "<div style='margin-top: 20px; padding-top: 18px; border-top: 1px dashed rgba(255,255,255,0.6); font-size:15.5px; color:#ffffff; font-weight: 600; font-family:monospace; display:flex; flex-direction:column; gap:12px; align-items:center;'>";
-                    extraInfo += "<div><span style='font-weight: 900;'>IPv6 (DHCPv6): </span>" + ipv6Label + "</div>";
+                    var ipv6Html = "<div style='font-size:15.5px; font-weight:bold; color:#ffffff; font-family:monospace; letter-spacing:0.5px; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; line-height: 1.8; margin-top: 6px;'><span style='font-weight: 900; margin-right: 8px;'>IPv6 (DHCPv6): </span>" + ipv6Label + "</div>";
+
+                    // 虚线的透明度0.6，整体字号 15.5px。现在这里面只有 Wi-Fi 信息了！
+                    var extraInfo = "<div style='margin-top: 16px; padding-top: 18px; border-top: 1px dashed rgba(255,255,255,0.6); font-size:15.5px; color:#ffffff; font-weight: 600; font-family:monospace; display:flex; flex-direction:column; gap:12px; align-items:center;'>";
                     extraInfo += wifiLines.join('');
                     extraInfo += "</div>";
 
-                    // 最终渲染输出
-                    if (modeTextEl) modeTextEl.innerHTML = "<div style='font-size:17px; font-weight:600; margin-bottom:12px; color:#ffffff; font-family: monospace; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;'><span style='white-space:nowrap;'>" + sTitle + "</span>" + statusBadge + "</div>" + "<div style='font-size:15.5px; font-weight:bold; color:#ffffff; font-family:monospace; letter-spacing:0.5px; display:flex; flex-wrap:wrap; justify-content:center; line-height: 1.8;'>" + sDetails + "</div>" + extraInfo;
+                    // 最终渲染输出：按顺序拼接 sDetails (IP信息) -> ipv6Html (IPv6信息) -> extraInfo (带虚线的Wi-Fi信息)
+                    if (modeTextEl) modeTextEl.innerHTML = "<div style='font-size:17px; font-weight:600; margin-bottom:12px; color:#ffffff; font-family: monospace; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px;'><span style='white-space:nowrap;'>" + sTitle + "</span>" + statusBadge + "</div>" + "<div style='font-size:15.5px; font-weight:bold; color:#ffffff; font-family:monospace; letter-spacing:0.5px; display:flex; flex-wrap:wrap; justify-content:center; line-height: 1.8;'>" + sDetails + "</div>" + ipv6Html + extraInfo;
 
-                    }).catch(function() {});
+                }).catch(function() {});
             } catch(e) {}
         }
         updateStatusDisplay(false);
@@ -886,7 +887,7 @@ return view.extend({
         var en2g = container.querySelector('#wifi-2g-en');
         var en5g = container.querySelector('#wifi-5g-en');
 
-        // 🌟 场景1：单芯片模式下，来回拨动开关时智能转换并同步！
+        // 单芯片模式下，来回拨动开关时智能转换并同步！
         en2g.addEventListener('change', function() { 
             if(window._isSingleChip && this.checked) {
                 en5g.checked = false; 
@@ -943,7 +944,7 @@ return view.extend({
                     var se = container.querySelector('#wifi-smart-enc').value;
                     var sen = container.querySelector('#wifi-smart-en').checked;
                     
-                    // 🌟 场景2：关闭“多频合一”时，自动为您分裂出 2.4G 和 5G 的智能后缀！
+                    // 关闭“多频合一”时，自动加上 2.4G 或 5G 的后缀！
                     container.querySelector('#wifi-2g-ssid').value = smartConvertSsid(ss, '2g');
                     container.querySelector('#wifi-2g-key').value = sk;
                     container.querySelector('#wifi-2g-enc').value = se;
