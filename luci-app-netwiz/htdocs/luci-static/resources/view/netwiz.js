@@ -493,7 +493,7 @@ return view.extend({
             '               <div style="font-weight: 600; color: #222; font-size: 15px; word-break: break-word; line-height: 1.3;">{{LBL_FORCE_APPLY}}</div>',
             '               <div style="font-size: 12px; color: #64748b; margin-top: 4px; word-break: break-word; line-height: 1.4;">{{DESC_FORCE_APPLY}}</div>',
             '           </div>',
-            '           <label class="nw-switch" style="flex-shrink: 0;"><input type="checkbox" id="lan-force-toggle"><span class="nw-slider"></span></label>',
+            '           <label class="nw-switch" style="flex-shrink: 0;"><input type="checkbox" id="lan-safe-toggle" checked><span class="nw-slider"></span></label>',
             '        </div>',
             '      </div>',
             '    </div>',
@@ -1216,8 +1216,8 @@ return view.extend({
                     a2 = container.querySelector('#lan-gw').value.trim(); 
                     a3 = calculateNetmask(a1); 
                     a4 = bypassToggle.checked ? '1' : '0'; 
-                    var forceEl = container.querySelector('#lan-force-toggle'); 
-                    a5 = (forceEl && forceEl.checked) ? '0' : '1';
+                    var safeEl = container.querySelector('#lan-safe-toggle'); 
+                    a5 = (safeEl && safeEl.checked) ? '1' : '0';
                     var ipv6El = container.querySelector('#lan-ipv6-toggle');
                     a6 = (ipv6El && ipv6El.checked) ? '1' : '0';
                     actionDetail = '<b style="color:#3b82f6;">' + a1 + '</b>';
