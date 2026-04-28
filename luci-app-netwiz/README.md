@@ -113,29 +113,6 @@ luci-app-netwiz/
 ```
 ---
 
-### 📊 Monitoring & Logging
-
-The plugin features a flash-friendly, persistent logging system (`/etc/netwiz.log`) equipped with a strict 600-line auto-trimming safety valve. This ensures complete observability across reboots without risking router flash memory degradation.
-
-You can monitor the system state and trace execution events via SSH:
-
-**1. Watch the Netwiz Exclusive Safe-Log:**
-
-```bash
-# Real-time monitoring (tracks Monitor, Engine, RPC, and Recovery events)
-tail -f /etc/netwiz.log
-```
-```bash
-# View the full log history
-cat /etc/netwiz.log
-```
-
-**2. Check System-Level Alerts:**
-Filter OpenWrt global system logs for Netwiz emergency alerts (e.g., Power-loss recovery triggers)
-
-```bash
-logread | grep Netwiz
-```
 <img width="680" alt="Image" src="https://github.com/user-attachments/assets/b2fca517-cbd2-4aa0-b557-bac5fd557dba" />
 <img width="680" alt="Image" src="https://github.com/user-attachments/assets/cce37944-d90a-4653-923c-d957812d8f37" />
 <img width="680" alt="Image" src="https://github.com/user-attachments/assets/8cae623d-766f-49a8-8c6c-ab78738d6b88" />
