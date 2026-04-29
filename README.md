@@ -12,14 +12,16 @@
 
 ## English
 
-```bash
-wget -qO- https://raw.githubusercontent.com/huchd0/luci-app-netwiz/master/install.sh | sh
-```
-
 ### Description
 **Netwiz(luci-app-netwiz)** is a minimalist, safe, and non-destructive network configuration interface for OpenWrt/ImmortalWrt. 
 
 It is designed to be highly user-friendly for novices setting up secondary routers (DHCP/Static IP) or bypass routers.
+
+### Installation Methods
+
+**1**、  [Use the one-click command for quick installation.](#install)
+
+**2**、Go to the  [Releases](../../releases)  page to download the precompiled .apk or .ipk package, then upload and install it via the router’s web interface.
 
 ### 🌟 Key Features
 
@@ -111,11 +113,6 @@ Core Supported Modules
 * **修复隐藏故障：** 针对各种残缺、冲突或被带偏的底层配置，自动清理系统中遗留的错误 Wi-Fi 配置，纠正被卡死的网络状态，让无线的表现更稳定。
 * **智能频宽满血释放：** 告别残血网络！在保存配置时，智能识别硬件极限，静默优化并提升 Wi-Fi 频宽，轻松跑满带宽。
 
-### 安装方法
-
-**1**、  [一键命令安装](#install)
-
-**2**、 前往 [Releases](../../releases) 页面下载编译好的 .apk 或 .ipk 安装包，在路由器后台上传安装即可。
 
 ### 快捷导航
 👉 **在 LuCI 一级菜单的最后面（“退出”按钮的前一个）直接找到👉网络向导**。
