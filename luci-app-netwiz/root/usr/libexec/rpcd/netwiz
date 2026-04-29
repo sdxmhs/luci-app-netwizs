@@ -321,12 +321,25 @@ case "$1" in
                     fi
                     
                     uci commit wireless
+
+                    # 第一次开机完成配置后，将首页恢复为原版的系统概览
+                    if [ "$(uci -q get luci.main.index)" = "admin/netwiz" ]; then
+                        uci delete luci.main.index
+                        uci commit luci
+                    fi
+
                     log "========== Wi-Fi 写入逻辑执行完毕，准备重启网络 =========="
                     echo '{"result":0}'
                     ( exec >/dev/null 2>&1 </dev/null; sleep 4; wifi up; wifi reload ) &
                     exit 0
                 fi
                 
+                # 第一次开机配置后针对其他模式（路由、旁路由等）的解除
+                if [ "$(uci -q get luci.main.index)" = "admin/netwiz" ]; then
+                    uci delete luci.main.index
+                    uci commit luci
+                fi
+
                 echo '{"result":0}'
                 ( exec >/dev/null 2>&1 </dev/null; sleep 4; /etc/init.d/network restart; /etc/init.d/dnsmasq restart; /etc/init.d/uhttpd restart ) &
                 exit 0
