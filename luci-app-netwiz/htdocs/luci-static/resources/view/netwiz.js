@@ -536,18 +536,19 @@ return view.extend({
         function safeUciGet(c, s, o, d) { try { var v = uci.get(c, s, o); return (v === null || v === undefined) ? d : String(v).trim(); } catch(e) { return d; } }
 
         // 智能 SSID 后缀转换
-        function smartConvertSsid(ssid, toBand) {
+        // 去除 _2.4G, -5G, 2.4G, 5G, 甚至 2.4, 5 等冗余后缀
+        function cleanSsidSuffix(ssid) {
             if (!ssid) return '';
-            var s = ssid.trim();
-            if (toBand === '2g') {
-                if (s.match(/5[gG]/)) return s.replace(/5[gG]/g, '2.4G');
-                if (!s.match(/2\.4[gG]/)) return s + '_2.4G';
-            } else {
-                if (s.match(/2\.4[gG]/)) return s.replace(/2\.4[gG]/g, '5G');
-                if (!s.match(/5[gG]/)) return s + '_5G';
-            }
-            return s;
+            // 正则匹配：结尾的可选下划线/横杠/空格 + 2.4或5 + 可选的G或g
+            return ssid.replace(/[_\-\s]?(2\.4|5)[gG]?$/i, '');
         }
+
+        // 生成纯净的目标名称
+        function smartConvertSsid(ssid, targetBand) {
+            var base = cleanSsidSuffix(ssid);
+            if (!base) base = 'OpenWrt';
+            return targetBand === '2g' ? base + '_2.4G' : base + '_5G';
+}
 
         Promise.all([
             callNetCheckWifi(),
@@ -1017,53 +1018,73 @@ return view.extend({
         });
 
         smartToggle.addEventListener('change', function() {
-            if (legacyToggle.checked && this.checked) {
-                this.checked = false;
-                openModal({ title: T['M_WARN_TIT'], msg: T['M_LEGACY_WARN'], okText: T['M_CLOSE'] });
-                return;
-            }
+            var isSmart = this.checked;
+            var smartUi = container.querySelector('#wifi-smart-ui');
+            var splitUi = container.querySelector('#wifi-split-ui');
             
-            if (window._wifiLoaded) {
-                if (this.checked) {
-                    var s2 = container.querySelector('#wifi-2g-ssid').value;
-                    var k2 = container.querySelector('#wifi-2g-key').value;
-                    var e2 = container.querySelector('#wifi-2g-enc').value;
-                    var s5 = container.querySelector('#wifi-5g-ssid').value;
-                    var k5 = container.querySelector('#wifi-5g-key').value;
-                    var e5 = container.querySelector('#wifi-5g-enc').value;
+            if (isSmart) {
+                // 进入多频合一
+                smartUi.style.display = 'block';
+                splitUi.style.display = 'none';
+
+                // 1. 内存备份：在被合并覆盖前，保存用户已有的 2.4G 和 5G 独立账号密码
+                window._backupSplit = {
+                    s2: container.querySelector('#wifi-2g-ssid').value,
+                    k2: container.querySelector('#wifi-2g-key').value,
+                    e2: container.querySelector('#wifi-2g-enc').value,
+                    s5: container.querySelector('#wifi-5g-ssid').value,
+                    k5: container.querySelector('#wifi-5g-key').value,
+                    e5: container.querySelector('#wifi-5g-enc').value
+                };
+
+                // 2. 智能提取：寻找当前处于“开启”状态的频段（优先 5G）作为基底
+                var en2 = container.querySelector('#wifi-2g-en').checked;
+                var en5 = container.querySelector('#wifi-5g-en').checked;
+                var pickBand = (en5 || !en2) ? '5g' : '2g'; // 只要 5G 开启就优先取 5G
+                
+                var pickSsid = container.querySelector('#wifi-' + pickBand + '-ssid').value;
+                var pickKey = container.querySelector('#wifi-' + pickBand + '-key').value;
+                var pickEnc = container.querySelector('#wifi-' + pickBand + '-enc').value;
+                
+                // 3. 剥离后缀，完美回填：比如取到了 "mywifi_5G"，剥离后变成 "mywifi" 填入合一界面
+                var smartSsidEl = container.querySelector('#wifi-smart-ssid');
+                if (pickSsid && !smartSsidEl.dataset.initialized) {
+                    smartSsidEl.value = cleanSsidSuffix(pickSsid);
+                    container.querySelector('#wifi-smart-key').value = pickKey;
+                    container.querySelector('#wifi-smart-enc').value = pickEnc;
+                    smartSsidEl.dataset.initialized = 'true'; // 防止后续随意覆盖在合一界面的手动修改
+                }
+
+            } else {
+                // 拆分为独立频段
+                smartUi.style.display = 'none';
+                splitUi.style.display = 'block';
+
+                // 4. 在内存中找到了之前分开的账号，直接原样恢复！
+                if (window._backupSplit && (window._backupSplit.s2 || window._backupSplit.s5)) {
+                    container.querySelector('#wifi-2g-ssid').value = window._backupSplit.s2;
+                    container.querySelector('#wifi-2g-key').value = window._backupSplit.k2;
+                    container.querySelector('#wifi-2g-enc').value = window._backupSplit.e2;
                     
-                    var targetSsid = s2 ? s2 : s5;
-                    var targetKey = s2 ? k2 : k5;
-                    var targetEnc = s2 ? e2 : e5;
-                    
-                    container.querySelector('#wifi-smart-ssid').value = targetSsid;
-                    container.querySelector('#wifi-smart-key').value = targetKey;
-                    container.querySelector('#wifi-smart-enc').value = targetEnc;
-                    
-                    var en2 = container.querySelector('#wifi-2g-en').checked;
-                    var en5 = container.querySelector('#wifi-5g-en').checked;
-                    container.querySelector('#wifi-smart-en').checked = (en2 || en5);
+                    container.querySelector('#wifi-5g-ssid').value = window._backupSplit.s5;
+                    container.querySelector('#wifi-5g-key').value = window._backupSplit.k5;
+                    container.querySelector('#wifi-5g-enc').value = window._backupSplit.e5;
                 } else {
-                    var ss = container.querySelector('#wifi-smart-ssid').value;
-                    var sk = container.querySelector('#wifi-smart-key').value;
-                    var se = container.querySelector('#wifi-smart-enc').value;
-                    var sen = container.querySelector('#wifi-smart-en').checked;
+                    // 没找到历史记录，就拿当前的合一名称自动生成（彻底规避重复后缀）
+                    var baseSsid = container.querySelector('#wifi-smart-ssid').value;
+                    var baseKey = container.querySelector('#wifi-smart-key').value;
+                    var baseEnc = container.querySelector('#wifi-smart-enc').value;
                     
-                    // 关闭“多频合一”时，自动加上 2.4G 或 5G 的后缀！
-                    container.querySelector('#wifi-2g-ssid').value = smartConvertSsid(ss, '2g');
-                    container.querySelector('#wifi-2g-key').value = sk;
-                    container.querySelector('#wifi-2g-enc').value = se;
-                    container.querySelector('#wifi-2g-en').checked = sen;
+                    // 不产生叠词后缀
+                    container.querySelector('#wifi-2g-ssid').value = smartConvertSsid(baseSsid, '2g');
+                    container.querySelector('#wifi-2g-key').value = baseKey;
+                    container.querySelector('#wifi-2g-enc').value = baseEnc;
                     
-                    container.querySelector('#wifi-5g-ssid').value = smartConvertSsid(ss, '5g');
-                    container.querySelector('#wifi-5g-key').value = sk;
-                    container.querySelector('#wifi-5g-enc').value = se;
-                    container.querySelector('#wifi-5g-en').checked = sen;
+                    container.querySelector('#wifi-5g-ssid').value = smartConvertSsid(baseSsid, '5g');
+                    container.querySelector('#wifi-5g-key').value = baseKey;
+                    container.querySelector('#wifi-5g-enc').value = baseEnc;
                 }
             }
-
-            container.querySelector('#wifi-smart-ui').style.display = this.checked ? 'block' : 'none';
-            container.querySelector('#wifi-split-ui').style.display = this.checked ? 'none' : 'block';
         });
 
         legacyToggle.addEventListener('change', function() {
