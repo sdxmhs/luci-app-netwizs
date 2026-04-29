@@ -21,6 +21,11 @@ case "$1" in
     call)
         case "$2" in
             check_wifi)
+                # 只要打开页面，前端解除首页劫持
+                if [ "$(uci -q get luci.main.index)" = "admin/netwiz" ]; then
+                    uci delete luci.main.index
+                    uci commit luci
+                fi
                 has_wifi="false"
                 if [ -f /etc/config/wireless ] && grep -q "wifi-device" /etc/config/wireless; then
                     has_wifi="true"
