@@ -337,6 +337,7 @@ case "$1" in
                         # 2.创建纯净的 wwan 接口
                         uci set network.wwan=interface
                         uci set network.wwan.proto='dhcp'
+                        uci set network.wwan.metric='20'
                         
                         # 3. 写入无线客户端配置
                         uci set wireless.wisp_sta=wifi-iface
