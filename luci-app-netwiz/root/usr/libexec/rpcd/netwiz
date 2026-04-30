@@ -128,7 +128,7 @@ case "$1" in
                 elif [ "$mode" = "wifi" ]; then
                     payload="$arg1"
                     
-                    # 🌟 终极破局：瞬间给前端返回成功，骗过超时强杀机制！
+                    # 给前端返回成功
                     echo '{"result":0}'
                     
                     # 将所有耗时的配置任务扔进系统的后台默默执行
@@ -375,14 +375,14 @@ case "$1" in
                         uci commit network
                         log "========== Wi-Fi 写入逻辑执行完毕，准备重启网络 =========="
                         
-                        # 在后台从容地重启网络，不用再怕超时被杀了
+                        # 在后台从容地重启网络，不超时
                         sleep 3
                         /etc/init.d/network restart
                         
                         exit 0
                     ) &
                     
-                    # 主程序瞬间退出，告诉前端“处理成功”，释放看门狗压力
+                    # 主程序瞬间退出
                     exit 0
                 fi
                 
