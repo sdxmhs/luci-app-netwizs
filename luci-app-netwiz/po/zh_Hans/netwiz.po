@@ -552,3 +552,9 @@ msgstr "目标 Wi-Fi 名称"
 
 msgid "Upstream Wi-Fi Password"
 msgstr "请输入上级 Wi-Fi 的密码"
+
+msgid "Target Wi-Fi"
+msgstr "目标 Wi-Fi 名称"
+
+msgid "Upstream Wi-Fi Password"
+msgstr "请输入上级 Wi-Fi 的密码"
