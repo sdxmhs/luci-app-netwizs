@@ -22,7 +22,7 @@ It is designed to be highly user-friendly for novices setting up secondary route
 **1**、  [Use the one-click command for quick installation.](#install)
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/sdxmhs/luci-app-netwiz/master/install.sh | sh
+wget -qO- https://raw.githubusercontent.com/sdxmhs/luci-app-netwizs/master/install.sh | sh
 ```
 
 **2**、Go to the  [Releases](../../releases)  page to download the precompiled .apk or .ipk package, then upload and install it via the router’s web interface.
@@ -150,12 +150,12 @@ Core Supported Modules
 我们提供了一键智能安装脚本。无论你是老系统还是新系统，只需在 SSH 终端中直接复制并执行以下单行命令，即可自动完成 **【判断系统架构 -> 下载对应格式 -> 安装 -> 修复权限与清理缓存】** 的全流程：
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/sdxmhs/luci-app-netwiz/master/install.sh | sh
+wget -qO- https://raw.githubusercontent.com/sdxmhs/luci-app-netwizs/master/install.sh | sh
 ```
 
 💡 **提示**：如果你的网络无法直接访问 GitHub Raw，可以在链接前加上代理加速，例如：
 ```bash
-wget -qO- https://ghproxy.net/https://raw.githubusercontent.com/sdxmhs/luci-app-netwiz/master/install.sh | sh
+wget -qO- https://ghproxy.net/https://raw.githubusercontent.com/sdxmhs/luci-app-netwizs/master/install.sh | sh
 ```
 
 ---
