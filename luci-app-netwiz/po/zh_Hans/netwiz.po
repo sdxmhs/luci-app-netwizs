@@ -553,8 +553,8 @@ msgstr "目标 Wi-Fi 名称"
 msgid "Upstream Wi-Fi Password"
 msgstr "请输入上级 Wi-Fi 的密码"
 
-msgid "Target Wi-Fi"
-msgstr "目标 Wi-Fi 名称"
+msgid "802.11k/v/r Fast Roaming"
+msgstr "802.11k/v/r 无缝漫游"
 
-msgid "Upstream Wi-Fi Password"
-msgstr "请输入上级 Wi-Fi 的密码"
+msgid "Enable seamless transition. May cause connection issues for old IoT devices."
+msgstr "开启路由器间的无缝切换。注意：可能导致老旧的智能家居（IoT）设备无法连接。"
