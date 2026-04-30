@@ -519,3 +519,6 @@ msgstr "2.4G Wi-Fi 帐号"
 
 msgid "No Password"
 msgstr "无密码"
+
+msgid "Wireless Relay: Enabled"
+msgstr "已开启无线中继"
