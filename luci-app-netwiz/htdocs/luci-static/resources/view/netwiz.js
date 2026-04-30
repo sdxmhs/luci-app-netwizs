@@ -498,8 +498,8 @@ return view.extend({
             '              <label class="nw-switch"><input type="checkbox" id="wisp-toggle"><span class="nw-slider"></span></label>',
             '           </div>',
             '           <div style="font-size: 13px; color: #64748b; margin-bottom: 15px;">{{DESC_WISP}}</div>',
-            '           <div id="wisp-ui-panel" style="display:none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">',
-            '              <button id="btn-wisp-scan" class="cbi-button cbi-button-apply" style="width:100%; margin-bottom:15px; background:#0f172a !important;">{{BTN_SCAN}}</button>',
+            '           <div id="wisp-ui-panel" style="text-align: center; display:none; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">',
+            '              <button id="btn-wisp-scan" class="cbi-button cbi-button-apply" style="width:100%; background:#0f172a !important;">{{BTN_SCAN}}</button>',
             '              <div id="wisp-selected-info" style="display:none;">',
             '                 <div class="nw-value"><label class="nw-value-title">Target SSID</label><div class="nw-value-field"><input type="text" id="wisp-target-ssid" readonly style="background:#e2e8f0 !important; color:#475569 !important;"></div></div>',
             '                 <div class="nw-value"><label class="nw-value-title">{{WISP_PWD_PROMPT}}</label><div class="nw-value-field"><input type="password" id="wisp-target-key" placeholder="Upstream Wi-Fi Password"></div></div>',
@@ -935,7 +935,7 @@ return view.extend({
                     var wifiLines = [];
                     
                     if (activeIfaces.length === 0) {
-                        wifiLines.push("<div><span style='opacity:0.9;'>" + T['TXT_WIFI_STATUS'] + ": </span><b style='color:#ef4444;'>" + T['TXT_OFF'] + "</b></div>");
+                        wifiLines.push("<div><span>" + T['TXT_WIFI_STATUS'] + ": </span><b style='color:#ef4444;'>" + T['TXT_OFF'] + "</b></div>");
                     } else {
                         activeIfaces.forEach(function(i) {
                             var sName = i.ssid;
@@ -944,7 +944,7 @@ return view.extend({
                             // 暴力判定：只要是 sta 模式，就是中继！
                             if (i.mode === 'sta') {
                                 // 中继模式：绿字标题，绝对不显示密码括号！
-                                var tLbl = "<b style='color:#10b981;'>已开启无线中继</b>";
+                                var tLbl = "<b style='color:#10b981;padding: 8px 16px;background: #fff;border-radius: 10px;'>已开启无线中继</b>";
                                 wifiLines.push("<div style='display:flex; align-items:center; justify-content:center; gap:8px;'><span><span style='font-size:15.5px; opacity:0.9; font-weight: 600;'>" + tLbl + ":</span> <span class='nw-hl' style='font-size:16.5px; letter-spacing:0.5px; margin-left:4px;'>" + sName + "</span></span></div>");
                             } else {
                                 // 正常 AP 模式：判断是 2.4G 还是 5G，并显示密码
